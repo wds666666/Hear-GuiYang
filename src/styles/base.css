@@ -1,0 +1,23 @@
+*, *::before, *::after { box-sizing: border-box; }
+html { color-scheme: light; scroll-behavior: smooth; }
+body { margin: 0; min-width: 320px; color: var(--ink); background: var(--paper); font-family: var(--body); }
+button, input, audio { font: inherit; }
+button { color: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, a:focus-visible, audio:focus-visible { outline: 3px solid var(--jade-bright); outline-offset: 3px; }
+img { display: block; max-width: 100%; }
+h1, h2, h3, p { margin-top: 0; }
+#app { min-height: 100dvh; }
+.skip-link { position: fixed; z-index: 9999; top: 8px; left: 8px; padding: 10px 14px; color: #fff; background: var(--ink); transform: translateY(-150%); }
+.skip-link:focus { transform: none; }
+.eyebrow { margin-bottom: 8px; color: var(--jade); font-size: 11px; font-weight: 750; letter-spacing: .18em; text-transform: uppercase; }
+.glass-panel { border: 1px solid rgba(255, 255, 255, .68); background: var(--mist); box-shadow: var(--shadow); backdrop-filter: blur(18px) saturate(1.15); }
+.round-action { display: grid; width: 46px; height: 46px; padding: 0; place-items: center; border: 1px solid rgba(255,255,255,.65); border-radius: 50%; color: #fff; background: rgba(7,16,15,.42); backdrop-filter: blur(12px); cursor: pointer; font-size: 22px; transition: transform .2s, background .2s; }
+.round-action:hover { background: rgba(7,16,15,.68); transform: translateX(-2px); }
+.primary-action { display: flex; width: 100%; align-items: center; justify-content: space-between; margin-top: auto; padding: 14px 18px; border: 0; border-radius: 4px; color: #fff; background: var(--ink); cursor: pointer; font-weight: 700; }
+.primary-action:hover { background: var(--jade); }
+.unavailable { display: flex; align-items: center; gap: 12px; margin-top: auto; padding: 13px; border: 1px dashed var(--line); background: rgba(16,38,36,.035); }
+.unavailable__mark { display: grid; width: 38px; height: 38px; flex: 0 0 auto; place-items: center; border-radius: 50%; color: var(--ink-soft); background: rgba(16,38,36,.08); letter-spacing: 2px; }
+.unavailable h3 { margin: 0 0 3px; font-size: 14px; }
+.unavailable p { margin: 0; color: var(--ink-soft); font-size: 12px; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
