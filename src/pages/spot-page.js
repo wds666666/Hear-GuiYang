@@ -8,6 +8,7 @@ export function renderSpotPage(root, spot, navigate) {
       <div class="spot-hero__shade"></div>
       <nav class="spot-nav">
         <button type="button" class="round-action" data-back aria-label="返回地图">←</button>
+        <img class="brand-mark" src="${asset('/assets/images/logo-mark.png')}" alt="" width="240" height="240" />
         <span>听见贵阳 · ${spot.name}</span>
       </nav>
       <div class="spot-hero__content">

@@ -16,6 +16,7 @@ export function renderSubMapPage(root, spot, navigate) {
     <div id="submap" class="map-canvas${illustrated ? ' map-canvas--illustrated' : ''}" aria-label="${spot.name}小地图"></div>
     <header class="submap-bar glass-panel">
       <button type="button" class="round-action round-action--light" data-back aria-label="返回贵阳地图">←</button>
+      <img class="brand-mark" src="${asset('/assets/images/logo-mark.png')}" alt="" width="240" height="240" />
       <div>
         <p class="eyebrow">${spot.subSpots.length} 个声音角落</p>
         <h1>${spot.name}</h1>
@@ -124,8 +125,23 @@ export function renderSubMapPage(root, spot, navigate) {
     listeners.push([row, enter, leave, click]);
   });
 
+  const unlock = () => {
+    if (!audio.paused) return;
+    const src = activeSub?.audio?.src || spot.subSpots.find((item) => item.audio?.src)?.audio.src;
+    if (!src) return;
+    audio.src = asset(src);
+    audio.play().then(() => {
+      if (!live || !activeSub) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    }).catch(() => {});
+  };
+  root.addEventListener('pointerdown', unlock, true);
+
   return () => {
     live = false;
+    root.removeEventListener('pointerdown', unlock, true);
     back.removeEventListener('click', goBack);
     splatBtn?.removeEventListener('click', goSplat);
     listeners.forEach(([row, enter, leave, click]) => {

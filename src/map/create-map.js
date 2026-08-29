@@ -18,10 +18,11 @@ export function createMap({
   element, spots, onSelect, onPreview, onPreviewEnd,
   center = GUIYANG_CENTER, zoom = 12, fit = false, color, extraMarkers = [],
 }) {
-  let useAmap = false;
+  let useAmap = true;
   const coordinates = (item) => (useAmap ? wgs84ToGcj02(item.lat, item.lng) : [item.lat, item.lng]);
 
-  const map = L.map(element, { zoomControl: false }).setView(center, zoom);
+  const map = L.map(element, { zoomControl: false })
+    .setView(useAmap ? wgs84ToGcj02(center[0], center[1]) : center, zoom);
   L.control.zoom({ position: 'topright' }).addTo(map);
 
   const amap = L.tileLayer(
@@ -31,8 +32,8 @@ export function createMap({
   const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19, attribution: '© OpenStreetMap', crossOrigin: true,
   });
-  osm.addTo(map);
-  L.control.layers({ 'OpenStreetMap': osm, '高德地图': amap }, null, { position: 'topright' }).addTo(map);
+  amap.addTo(map);
+  L.control.layers({ '高德地图': amap, 'OpenStreetMap': osm }, null, { position: 'topright' }).addTo(map);
 
   const placed = [];
   const markerById = new Map();
@@ -85,11 +86,12 @@ export function createMap({
   };
 
   map.on('baselayerchange', (event) => applyBase(event.name === '高德地图'));
-  let osmFails = 0;
-  osm.on('tileerror', () => {
-    if (useAmap || ++osmFails < 4) return;
-    map.removeLayer(osm);
-    amap.addTo(map);
+  let amapFails = 0;
+  amap.on('tileerror', () => {
+    if (!useAmap || ++amapFails < 4) return;
+    map.removeLayer(amap);
+    osm.addTo(map);
+    applyBase(false);
   });
 
   return {

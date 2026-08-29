@@ -23,8 +23,9 @@
 .gs-action--off small { color: var(--ink-soft); }
 
 @media (max-width: 700px), (max-height: 540px) {
-  .submap-bar { top: calc(12px + var(--safe-top)); right: 58px; left: calc(12px + var(--safe-left)); padding: 11px 16px 11px 11px; }
+  .submap-bar { top: calc(12px + var(--safe-top)); right: 58px; left: calc(12px + var(--safe-left)); padding: 11px 16px 11px 11px; gap: 10px; }
   .submap-bar h1 { font-size: 22px; }
+  .submap-bar .brand-mark { width: 32px; height: 32px; }
   .submap-dock { right: 0; bottom: calc(78px + var(--safe-bottom)); left: 0; width: auto; max-height: none; margin: 0 10px; padding: 9px; border-radius: 15px; }
   .submap-dock .spot-dock__title { display: none; }
   .submap-dock .spot-dock__list { display: flex; max-height: none; gap: 4px; overflow-x: auto; -webkit-overflow-scrolling: touch; }

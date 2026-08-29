@@ -10,7 +10,6 @@ const audio = new Audio();
 audio.loop = true;
 audio.volume = .42;
 audio.playsInline = true;
-let soundReady = false;
 let dockOpen = false;
 let mapScheme = 'illustrated';
 let pickPixels = false;
@@ -44,8 +43,10 @@ export function renderMapPage(root, spots, navigate) {
     <div id="map-illustrated" class="map-canvas map-canvas--illustrated" aria-label="走进贵阳手绘地图"></div>
     <div id="map" class="map-canvas" hidden aria-label="贵阳景点地图"></div>
     <header class="map-brand glass-panel">
-      <p class="eyebrow">HEAR · GUIYANG</p>
-      <h1>听见贵阳</h1>
+      <div class="map-brand__head">
+        <img class="brand-mark" src="${asset('/assets/images/logo-mark.png')}" alt="Guizhou Soundscapes" width="480" height="480" />
+        <h1><span>听见</span><span>贵阳</span></h1>
+      </div>
       <p>沿着经纬度，听见一座城。</p>
       <span class="map-brand__status"><i></i> ${spots.length} 个声音坐标</span>
       <div class="map-scheme" role="group" aria-label="地图方案">
@@ -53,7 +54,6 @@ export function renderMapPage(root, spots, navigate) {
         <button type="button" data-scheme="geo" aria-pressed="false">写实地图</button>
       </div>
       <button type="button" class="sound-toggle" data-pick aria-pressed="${pickPixels}">${pickPixels ? '标定中 · 再点关闭' : '标定像素'}</button>
-      <button type="button" class="sound-toggle" data-sound aria-pressed="${soundReady}">${soundReady ? '声音已开' : '开启声音'}</button>
     </header>
     <div class="spot-dock-wrap ${dockOpen ? 'is-open' : ''}" data-dock-wrap>
       <button type="button" class="dock-tab glass-panel" data-dock-toggle aria-expanded="${dockOpen}" aria-controls="spot-dock">
@@ -81,12 +81,6 @@ export function renderMapPage(root, spots, navigate) {
   const page = root.querySelector('.map-page');
   let activeSpot = null;
   let live = true;
-  const soundBtn = root.querySelector('[data-sound]');
-  const markSoundOn = () => {
-    soundReady = true;
-    soundBtn.textContent = '声音已开';
-    soundBtn.setAttribute('aria-pressed', 'true');
-  };
 
   const preview = (spot) => {
     if (soundLab.isPlaying()) return; // 实验室正在融合播放时不叠加悬停试听
@@ -94,12 +88,7 @@ export function renderMapPage(root, spots, navigate) {
     activeSpot = spot;
     audio.src = asset(spot.audio.src);
     audio.play().then(() => {
-      soundReady = true;
-      if (!live) {
-        audio.pause();
-        return;
-      }
-      markSoundOn();
+      if (!live) audio.pause();
     }).catch(() => {});
     root.querySelectorAll('.spot-row').forEach((row) => row.classList.toggle('is-active', row.dataset.spot === spot.id));
   };
@@ -268,28 +257,19 @@ export function renderMapPage(root, spots, navigate) {
   });
 
   const unlock = () => {
-    if (soundReady || soundLab.isPlaying()) return;
+    if (soundLab.isPlaying() || !audio.paused) return;
     if (!audio.src) audio.src = asset((activeSpot || spots[0]).audio.src);
     audio.play().then(() => {
-      soundReady = true;
-      if (!live) {
-        audio.pause();
-        audio.currentTime = 0;
-        return;
-      }
-      markSoundOn();
-      if (!activeSpot) {
+      if (!live || !activeSpot) {
         audio.pause();
         audio.currentTime = 0;
       }
     }).catch(() => {});
   };
-  soundBtn.addEventListener('click', unlock);
   root.addEventListener('pointerdown', unlock, true);
 
   return () => {
     live = false;
-    soundBtn.removeEventListener('click', unlock);
     root.removeEventListener('pointerdown', unlock, true);
     dockToggle.removeEventListener('click', onDockToggle);
     listeners.forEach(([row, enter, leave, click]) => {

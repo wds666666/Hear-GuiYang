@@ -54,7 +54,7 @@ index.html
 
 ### 地图
 
-`src/map/create-map.js`：Leaflet 1.9，默认 OpenStreetMap、高德备选（OSM 瓦片失败则自动切高德）。景点坐标是 WGS84；高德底图用 `wgs84ToGcj02`。切底图时地图中心与 marker 同步换算。悬停走 Leaflet tooltip，点击走 `navigate`。
+`src/map/create-map.js`：Leaflet 1.9，默认高德地图、OpenStreetMap 备选（高德瓦片失败则自动切 OSM）。景点坐标是 WGS84；高德底图用 `wgs84ToGcj02`。切底图时地图中心与 marker 同步换算。悬停走 Leaflet tooltip，点击走 `navigate`。
 
 美食是 `extraMarkers`，不进景点列表，点开 `createFoodPanel`。
 

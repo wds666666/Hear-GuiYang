@@ -1,3 +1,5 @@
+import { asset } from '../assets.js';
+
 function formatView(spot, view) {
   const nums = (arr) => arr.map((value) => Number(value.toFixed(4)));
   return [
@@ -23,6 +25,7 @@ export function renderSplatPage(root, spot, navigate) {
     <div class="splat-stage" data-stage></div>
     <header class="splat-topbar">
       <button type="button" class="round-action round-action--dark" data-back aria-label="返回${spot.name}">←</button>
+      <img class="brand-mark" src="${asset('/assets/images/logo-mark.png')}" alt="" width="240" height="240" />
       <div><p class="eyebrow">3D GAUSSIAN SCENE</p><h1>${spot.name}</h1></div>
       <div class="splat-stats"><span data-count>读取场景</span><span data-fps>-- FPS</span></div>
     </header>

@@ -9,6 +9,7 @@ export function renderSubSpotPage(root, spot, subSpot, navigate) {
       <div class="spot-hero__shade"></div>
       <nav class="spot-nav">
         <button type="button" class="round-action" data-back aria-label="返回${spot.name}小地图">←</button>
+        <img class="brand-mark" src="${asset('/assets/images/logo-mark.png')}" alt="" width="240" height="240" />
         <span>听见贵阳 · ${spot.name} · ${subSpot.name}</span>
       </nav>
       <div class="spot-hero__content">
