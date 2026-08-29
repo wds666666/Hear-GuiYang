@@ -4,7 +4,7 @@ import { FirstPersonControls } from './controls.js';
 import { measureScene } from './bounds.js';
 import { cachedPlyUrl } from './ply-cache.js';
 
-const PIXEL_RATIO = Math.min(window.devicePixelRatio || 1, 2);
+const PIXEL_RATIO = window.devicePixelRatio || 1;
 const MAX_STEP = 1 / 30;
 const DEFAULT_UP = [0, -1, 0];
 const STATUS = { 0: '下载中', 1: '解析中', 2: '完成' };
@@ -29,7 +29,7 @@ export async function createSplatViewer({ stage, spot, onProgress, onStats, onVi
     useBuiltInControls: false, gpuAcceleratedSort: false,
     sharedMemoryForWorkers: crossOriginIsolated === true,
     integerBasedSort: false, halfPrecisionCovariancesOnGPU: false,
-    dynamicScene: false, antialiased: false, sphericalHarmonicsDegree: 0,
+    dynamicScene: false, antialiased: true, sphericalHarmonicsDegree: 0,
     renderMode: GaussianSplats3D.RenderMode.Always,
     sceneRevealMode: GaussianSplats3D.SceneRevealMode.Instant,
     logLevel: GaussianSplats3D.LogLevel.Error, inMemoryCompressionLevel: 0,

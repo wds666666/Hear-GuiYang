@@ -13,6 +13,7 @@ const clip = (slug) => ({
 export const spots = [
   {
     id: 'jiaxiu-tower', order: 1, name: '甲秀楼', icon: '楼', color: '#c96332', lat: 26.5717, lng: 106.7214,
+    pixel: { x: 2669, y: 4272 },
     description: '南明河上的明清古楼，翠微园拱桥与涵碧亭相映，是贵阳的城市地标。',
     image: '/assets/images/posters/spots/jiaxiu-tower.jpg', imageCredit: 'Vlog 抽帧',
     audio: rec('spots/jiaxiu-tower'), vlog: clip('spots/jiaxiu-tower'),
@@ -23,6 +24,7 @@ export const spots = [
   },
   {
     id: 'qianling-mountain', order: 2, name: '黔灵山', icon: '山', color: '#39795b', lat: 26.5986, lng: 106.6917,
+    pixel: { x: 2771, y: 3509 },
     description: '城中山林公园，猕猴、弘福寺与黔灵湖共生，可半日登高望远。',
     image: '/assets/images/qianling-mountain.jpg', imageCredit: '本地占位图',
     audio: ambience, vlog: noVlog,
@@ -144,6 +146,7 @@ export const spots = [
   },
   {
     id: 'guizhou-museum', order: 5, name: '贵州博物馆', icon: '博', color: '#a33d68', lat: 26.6513, lng: 106.6389,
+    pixel: { x: 1752, y: 3051 },
     description: '收藏贵州历史、民族与自然记忆，在一座馆里读懂多彩贵州。',
     image: '/assets/images/posters/spots/guizhou-museum.jpg', imageCredit: 'Vlog 抽帧',
     audio: rec('spots/guizhou-museum'), vlog: clip('spots/guizhou-museum'),

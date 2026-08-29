@@ -6,8 +6,17 @@
 .map-brand > p:not(.eyebrow) { margin-bottom: 15px; color: var(--ink-soft); font-size: 13px; }
 .map-brand__status { display: flex; align-items: center; gap: 8px; color: var(--ink-soft); font-size: 11px; }
 .map-brand__status i { width: 7px; height: 7px; border-radius: 50%; background: var(--jade-bright); box-shadow: 0 0 0 5px rgba(101,201,184,.16); }
-.sound-toggle { display: block; width: 100%; margin-top: 14px; padding: 8px 10px; border: 1px solid rgba(31,119,112,.22); border-radius: 8px; background: rgba(31,119,112,.08); cursor: pointer; font-size: 12px; font-weight: 650; }
+.map-scheme { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 14px; }
+.map-scheme button { padding: 7px 8px; border: 1px solid rgba(31,119,112,.22); border-radius: 8px; background: rgba(31,119,112,.08); cursor: pointer; font-size: 12px; font-weight: 650; }
+.map-scheme button[aria-pressed="true"] { color: var(--jade); background: rgba(31,119,112,.16); }
+.sound-toggle { display: block; width: 100%; margin-top: 10px; padding: 8px 10px; border: 1px solid rgba(31,119,112,.22); border-radius: 8px; background: rgba(31,119,112,.08); cursor: pointer; font-size: 12px; font-weight: 650; }
 .sound-toggle[aria-pressed="true"] { color: var(--jade); }
+.map-canvas--illustrated { background: #f6f1e4; }
+.map-canvas--illustrated::after { content: none; }
+.map-page.is-picking .map-canvas--illustrated,
+.map-page.is-picking .map-canvas--illustrated.leaflet-grab { cursor: crosshair; }
+.illustrated-layer { will-change: transform; pointer-events: none; }
+.map-page.is-geo [data-pick] { display: none; }
 .spot-dock-wrap { position: absolute; z-index: 1000; bottom: 24px; left: 24px; display: flex; width: 270px; flex-direction: column-reverse; align-items: stretch; gap: 10px; }
 .dock-tab { display: flex; flex: 0 0 auto; align-items: center; gap: 9px; padding: 13px 15px; border: 0; border-radius: 18px 18px 18px 3px; cursor: pointer; font: 650 12px var(--display); letter-spacing: .04em; }
 .dock-tab__icon { display: inline-block; color: var(--jade); transform: rotate(-90deg); transition: transform .32s cubic-bezier(.32,.72,.3,1); }
@@ -58,5 +67,6 @@
   .spot-row { min-width: 128px; }
   .spot-row small, .spot-row__arrow { display: none; }
   .map-note { display: none; }
+  .map-page.is-illustrated .map-note { display: flex; }
   .spot-preview { width: min(280px, calc(100vw - 32px)); }
 }

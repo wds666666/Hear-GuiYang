@@ -1,4 +1,5 @@
 import { createMap } from '../map/create-map.js';
+import { createImageMap } from '../map/create-image-map.js';
 import { createFoodPanel } from '../components/food-panel.js';
 import { createSoundLab } from '../components/sound-lab.js';
 import { createExperienceOverlay } from '../components/experience-overlay.js';
@@ -11,6 +12,8 @@ audio.volume = .42;
 audio.playsInline = true;
 let soundReady = false;
 let dockOpen = false;
+let mapScheme = 'illustrated';
+let pickPixels = false;
 
 const UNRECORDED = '#8a918e';
 
@@ -33,13 +36,19 @@ function mapSpot(spot) {
 }
 
 export function renderMapPage(root, spots, navigate) {
-  root.innerHTML = `<section class="map-page">
-    <div id="map" class="map-canvas" aria-label="贵阳景点地图"></div>
+  root.innerHTML = `<section class="map-page is-illustrated">
+    <div id="map-illustrated" class="map-canvas map-canvas--illustrated" aria-label="走进贵阳手绘地图"></div>
+    <div id="map" class="map-canvas" hidden aria-label="贵阳景点地图"></div>
     <header class="map-brand glass-panel">
       <p class="eyebrow">HEAR · GUIYANG</p>
       <h1>听见贵阳</h1>
       <p>沿着经纬度，听见一座城。</p>
       <span class="map-brand__status"><i></i> ${spots.length} 个声音坐标</span>
+      <div class="map-scheme" role="group" aria-label="地图方案">
+        <button type="button" data-scheme="illustrated" aria-pressed="true">手绘地图</button>
+        <button type="button" data-scheme="geo" aria-pressed="false">写实地图</button>
+      </div>
+      <button type="button" class="sound-toggle" data-pick aria-pressed="${pickPixels}">${pickPixels ? '标定中 · 再点关闭' : '标定像素'}</button>
       <button type="button" class="sound-toggle" data-sound aria-pressed="${soundReady}">${soundReady ? '声音已开' : '开启声音'}</button>
     </header>
     <div class="spot-dock-wrap ${dockOpen ? 'is-open' : ''}" data-dock-wrap>
@@ -58,7 +67,7 @@ export function renderMapPage(root, spots, navigate) {
         </div>
       </aside>
     </div>
-    <div class="map-note glass-panel"><span class="map-note__pulse"></span><span>悬停标记试听<br><small>点击打开体验</small></span></div>
+    <div class="map-note glass-panel"><span class="map-note__pulse"></span><span data-map-note>悬停标记试听<br><small>⌃点击复制像素 · 或打开标定</small></span></div>
     <button type="button" class="lab-tab glass-panel" data-lab-toggle aria-expanded="false" aria-controls="sound-lab">
       <span class="lab-tab__icon" aria-hidden="true">◉</span>
       <span>声音实验室</span>
@@ -142,22 +151,86 @@ export function renderMapPage(root, spots, navigate) {
   };
   labTab.addEventListener('click', onLabToggle);
 
-  const mapController = createMap({
-    element: root.querySelector('#map'), spots: spots.map(mapSpot),
+  const illustratedEl = root.querySelector('#map-illustrated');
+  const geoEl = root.querySelector('#map');
+  const mapNote = root.querySelector('[data-map-note]');
+  const pickBtn = root.querySelector('[data-pick]');
+  const GEO_NOTE = '悬停标记试听<br><small>点击打开体验</small>';
+  const illNote = () => (pickPixels
+    ? '点击地图复制像素坐标<br><small>原点在图片左上角 · 再点标定关闭</small>'
+    : '悬停标记试听<br><small>⌃点击复制像素 · 或打开标定</small>');
+  const illustratedMap = createImageMap(illustratedEl, {
+    spots: spots.map(mapSpot),
     onSelect: openSpot,
     onPreview: preview,
     onPreviewEnd: endPreview,
-    extraMarkers: [{
-      ...foodMarker,
-      eyebrow: '专题',
-      onClick: () => {
-        soundLab.close();
-        setLabOpen(false);
-        audio.pause();
-        foodPanel.open();
-      },
-    }],
+    pick: pickPixels,
+    onPick: ({ text }) => {
+      mapNote.innerHTML = `已复制 ${text}<br><small>像素 · 左上原点</small>`;
+    },
   });
+  let geoMap = null;
+
+  const ensureGeoMap = () => {
+    geoMap ??= createMap({
+      element: geoEl, spots: spots.map(mapSpot),
+      onSelect: openSpot,
+      onPreview: preview,
+      onPreviewEnd: endPreview,
+      extraMarkers: [{
+        ...foodMarker,
+        eyebrow: '专题',
+        onClick: () => {
+          soundLab.close();
+          setLabOpen(false);
+          audio.pause();
+          foodPanel.open();
+        },
+      }],
+    });
+    return geoMap;
+  };
+
+  const applyScheme = (scheme) => {
+    mapScheme = scheme;
+    page.classList.toggle('is-illustrated', scheme === 'illustrated');
+    page.classList.toggle('is-geo', scheme === 'geo');
+    root.querySelectorAll('[data-scheme]').forEach((btn) => {
+      btn.setAttribute('aria-pressed', String(btn.dataset.scheme === scheme));
+    });
+    mapNote.innerHTML = scheme === 'geo' ? GEO_NOTE : illNote();
+    pickBtn.hidden = scheme !== 'illustrated';
+    page.classList.toggle('is-picking', scheme === 'illustrated' && pickPixels);
+    if (scheme === 'geo') {
+      illustratedEl.style.visibility = 'hidden';
+      illustratedEl.style.pointerEvents = 'none';
+      geoEl.hidden = false;
+      geoEl.style.visibility = '';
+      geoEl.style.pointerEvents = '';
+      ensureGeoMap();
+    } else {
+      illustratedEl.style.visibility = '';
+      illustratedEl.style.pointerEvents = '';
+      if (geoMap) {
+        geoEl.style.visibility = 'hidden';
+        geoEl.style.pointerEvents = 'none';
+      }
+    }
+  };
+  applyScheme(mapScheme);
+
+  const onScheme = (event) => applyScheme(event.currentTarget.dataset.scheme);
+  root.querySelectorAll('[data-scheme]').forEach((btn) => btn.addEventListener('click', onScheme));
+
+  const onPickToggle = () => {
+    pickPixels = !pickPixels;
+    pickBtn.setAttribute('aria-pressed', String(pickPixels));
+    pickBtn.textContent = pickPixels ? '标定中 · 再点关闭' : '标定像素';
+    page.classList.toggle('is-picking', pickPixels);
+    illustratedMap.setPick(pickPixels);
+    mapNote.innerHTML = illNote();
+  };
+  pickBtn.addEventListener('click', onPickToggle);
 
   const dockWrap = root.querySelector('[data-dock-wrap]');
   const dockToggle = root.querySelector('[data-dock-toggle]');
@@ -173,9 +246,15 @@ export function renderMapPage(root, spots, navigate) {
   const listeners = [];
   root.querySelectorAll('.spot-row').forEach((row) => {
     const spot = spots.find((item) => item.id === row.dataset.spot);
-    // 悬停：地图飞到该坐标、放大 marker，并弹出带图片和简介的浮窗试听。
-    const enter = () => mapController.focus(spot);
-    const leave = () => mapController.close(spot);
+    // 悬停：飞到该坐标、放大 marker，并弹出带图片和简介的浮窗试听。
+    const enter = () => {
+      if (mapScheme === 'geo') geoMap?.focus(spot);
+      else illustratedMap.focus(spot);
+    };
+    const leave = () => {
+      geoMap?.close(spot);
+      illustratedMap.close(spot);
+    };
     const click = () => openSpot(spot);
     row.addEventListener('mouseenter', enter);
     row.addEventListener('focus', enter);
@@ -220,9 +299,12 @@ export function renderMapPage(root, spots, navigate) {
     audio.pause();
     audio.currentTime = 0;
     labTab.removeEventListener('click', onLabToggle);
+    root.querySelectorAll('[data-scheme]').forEach((btn) => btn.removeEventListener('click', onScheme));
+    pickBtn.removeEventListener('click', onPickToggle);
     soundLab.destroy();
     foodPanel.destroy();
     overlay.destroy();
-    mapController.destroy();
+    illustratedMap.destroy();
+    geoMap?.destroy();
   };
 }
