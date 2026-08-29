@@ -25,6 +25,7 @@
 .experience-card h3 { margin: 0 0 12px; font: 600 26px var(--display); }
 .experience-card > p:not(.eyebrow) { margin-bottom: 24px; color: var(--ink-soft); font-size: 13px; line-height: 1.75; }
 .experience-card audio { width: 100%; margin-top: auto; }
+.experience-video { width: 100%; max-height: 260px; margin-top: auto; border-radius: 6px; object-fit: contain; background: var(--night); }
 @media (max-width: 800px) {
   .spot-hero { min-height: 68dvh; }
   .spot-hero__content h1 { font-size: 54px; }

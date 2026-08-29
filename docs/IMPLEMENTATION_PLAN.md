@@ -1,5 +1,7 @@
 # 听见贵阳实施计划
 
+> 本文是早期实施记录，部分条目已过时。当前架构、运行方式和目录以仓库根目录 [README.md](../README.md) 为准。新 PLY 的初始视角见 [splat-camera.md](./splat-camera.md)。
+
 ## 1. 项目目标
 
 构建一个轻量的文旅 Web 应用：

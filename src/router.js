@@ -6,6 +6,12 @@ export function parseRoute(hash = window.location.hash) {
   if (parts[0] === 'spot' && parts[1] && parts[2] === 'splat' && parts.length === 3) {
     return { page: 'splat', id: parts[1] };
   }
+  if (parts[0] === 'spot' && parts[1] && parts[2] === 'map' && parts.length === 3) {
+    return { page: 'submap', id: parts[1] };
+  }
+  if (parts[0] === 'spot' && parts[1] && parts[2] === 'sub' && parts[3] && parts.length === 4) {
+    return { page: 'subspot', id: parts[1], subId: parts[3] };
+  }
   return { page: 'not-found' };
 }
 

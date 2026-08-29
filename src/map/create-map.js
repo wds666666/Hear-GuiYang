@@ -1,21 +1,27 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { wgs84ToGcj02 } from './china-coordinates.js';
+import { spotPreview } from '../components/spot-preview.js';
 
-function coordinates(spot, useAmap) {
-  return useAmap ? wgs84ToGcj02(spot.lat, spot.lng) : [spot.lat, spot.lng];
+const GUIYANG_CENTER = [26.578, 106.713];
+
+function markerIcon(item) {
+  return L.divIcon({
+    className: `sound-marker ${item.markerClass || ''}`.trim(),
+    html: `<span class="sound-marker__wave" style="--spot:${item.color}"></span>`
+      + `<span class="sound-marker__pin" style="--spot:${item.color}">${item.icon}</span>`,
+    iconSize: [48, 48], iconAnchor: [24, 24], tooltipAnchor: [0, -24],
+  });
 }
 
-function previewHtml(spot) {
-  return `<article class="spot-preview">
-    <img src="${spot.image}" alt="${spot.name}" />
-    <div><span class="spot-preview__eyebrow">正在聆听</span><h2>${spot.name}</h2><p>${spot.description}</p></div>
-  </article>`;
-}
-
-export function createMap({ element, spots, onSelect, onPreview, onPreviewEnd }) {
+export function createMap({
+  element, spots, onSelect, onPreview, onPreviewEnd,
+  center = GUIYANG_CENTER, zoom = 12, fit = false, color, extraMarkers = [],
+}) {
   let useAmap = true;
-  const map = L.map(element, { zoomControl: false }).setView(wgs84ToGcj02(26.578, 106.713), 12);
+  const coordinates = (item) => (useAmap ? wgs84ToGcj02(item.lat, item.lng) : [item.lat, item.lng]);
+
+  const map = L.map(element, { zoomControl: false }).setView(wgs84ToGcj02(center[0], center[1]), zoom);
   L.control.zoom({ position: 'topright' }).addTo(map);
 
   const amap = L.tileLayer(
@@ -28,44 +34,67 @@ export function createMap({ element, spots, onSelect, onPreview, onPreviewEnd })
   amap.addTo(map);
   L.control.layers({ '高德地图': amap, 'OpenStreetMap': osm }, null, { position: 'topright' }).addTo(map);
 
+  const placed = [];
   const markerById = new Map();
-  const markers = spots.map((spot) => {
-    const marker = L.marker(coordinates(spot, useAmap), {
-      title: spot.name,
-      alt: `打开${spot.name}`,
-      keyboard: true,
-      icon: L.divIcon({
-        className: 'sound-marker',
-        html: `<span class="sound-marker__wave" style="--spot:${spot.color}"></span><span class="sound-marker__pin" style="--spot:${spot.color}">${spot.icon}</span>`,
-        iconSize: [48, 48], iconAnchor: [24, 24], tooltipAnchor: [0, -24],
-      }),
-    }).addTo(map);
 
-    marker.bindTooltip(previewHtml(spot), {
+  const place = (item, options) => {
+    const marker = L.marker(coordinates(item), {
+      title: item.name,
+      alt: options.alt(item),
+      keyboard: true,
+      icon: markerIcon(item),
+    }).addTo(map);
+    marker.bindTooltip(spotPreview(item, options.eyebrow), {
       className: 'spot-tooltip', direction: 'top', offset: [0, -12], opacity: 1,
     });
-    marker.on('click', () => onSelect(spot));
-    marker.on('tooltipopen', () => onPreview(spot));
-    marker.on('tooltipclose', () => onPreviewEnd(spot));
-    markerById.set(spot.id, marker);
+    placed.push([item, marker]);
     return marker;
+  };
+
+  spots.forEach((spot) => {
+    const marker = place({ ...spot, color: spot.color || color }, {
+      alt: (item) => `打开${item.name}`,
+      eyebrow: '正在聆听',
+    });
+    marker.on('click', () => onSelect(spot));
+    marker.on('tooltipopen', () => onPreview?.(spot));
+    marker.on('tooltipclose', () => onPreviewEnd?.(spot));
+    markerById.set(spot.id, marker);
   });
+
+  extraMarkers.forEach((item) => {
+    const marker = place(item, {
+      alt: (entry) => `打开${entry.name}`,
+      eyebrow: item.eyebrow || '专题',
+    });
+    marker.on('click', () => item.onClick?.(item));
+    markerById.set(item.id, marker);
+  });
+
+  if (fit && spots.length) {
+    map.fitBounds(L.latLngBounds(spots.map(coordinates)), { padding: [110, 110], maxZoom: 17 });
+  }
 
   map.on('baselayerchange', (event) => {
     useAmap = event.name === '高德地图';
-    spots.forEach((spot, index) => markers[index].setLatLng(coordinates(spot, useAmap)));
+    placed.forEach(([item, marker]) => marker.setLatLng(coordinates(item)));
   });
 
   return {
-    focus(spot) {
+    focus(spot, { minZoom = 14 } = {}) {
       const marker = markerById.get(spot.id);
-      map.flyTo(marker.getLatLng(), Math.max(map.getZoom(), 14), { duration: .8 });
+      if (!marker) return;
+      map.flyTo(marker.getLatLng(), Math.max(map.getZoom(), minZoom), { duration: .8 });
+      marker.getElement()?.classList.add('is-highlighted');
       marker.openTooltip();
-      onPreview(spot);
+      onPreview?.(spot);
     },
     close(spot) {
-      markerById.get(spot.id)?.closeTooltip();
-      onPreviewEnd(spot);
+      const marker = markerById.get(spot.id);
+      if (!marker) return;
+      marker.getElement()?.classList.remove('is-highlighted');
+      marker.closeTooltip();
+      onPreviewEnd?.(spot);
     },
     destroy() {
       map.remove();

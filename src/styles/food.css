@@ -1,0 +1,29 @@
+.food-panel { position: absolute; z-index: 1200; top: 0; right: 0; bottom: 0; display: flex; width: min(392px, 92vw); flex-direction: column; padding: 20px 22px 22px; border-left: 1px solid rgba(255,255,255,.6); background: var(--mist); box-shadow: -22px 0 60px rgba(7,31,28,.22); backdrop-filter: blur(20px) saturate(1.15); opacity: 0; transform: translateX(102%); transition: transform .36s cubic-bezier(.32,.72,.3,1), opacity .28s; }
+.food-panel.is-open { opacity: 1; transform: none; }
+.food-panel__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 16px; }
+.food-panel__head h2 { margin: 0; font: 600 27px/1.1 var(--display); letter-spacing: .04em; }
+.food-panel__head .round-action { width: 38px; height: 38px; flex: 0 0 auto; font-size: 20px; }
+
+.food-stage { overflow: hidden; border-radius: 14px; background: var(--night); }
+.food-stage video { display: block; width: 100%; max-height: min(46dvh, 420px); margin: 0 auto; object-fit: contain; background: var(--night); }
+
+.food-meta { padding: 15px 2px 0; }
+.food-meta__tag { display: inline-block; padding: 4px 9px; border-radius: 999px; color: var(--jade); background: rgba(31,119,112,.1); font-size: 10px; font-weight: 750; letter-spacing: .12em; }
+.food-meta h3 { margin: 9px 0 6px; font: 600 22px var(--display); }
+.food-meta p { margin: 0 0 13px; color: var(--ink-soft); font-size: 13px; line-height: 1.7; }
+.food-audio { display: block; }
+.food-audio span { display: block; margin-bottom: 6px; color: var(--ink-soft); font-size: 10px; font-weight: 750; letter-spacing: .14em; }
+.food-audio audio { width: 100%; height: 36px; }
+
+.food-switch { display: flex; margin-top: auto; padding-top: 16px; gap: 9px; }
+.food-chip { display: flex; overflow: hidden; width: 100%; flex-direction: column; align-items: stretch; padding: 0; border: 2px solid transparent; border-radius: 12px; background: rgba(16,38,36,.05); cursor: pointer; transition: border-color .2s, transform .2s; }
+.food-chip:hover { transform: translateY(-2px); }
+.food-chip[aria-selected="true"] { border-color: var(--jade); }
+.food-chip img { width: 100%; height: 62px; object-fit: cover; }
+.food-chip span { padding: 7px 4px; font: 600 12px var(--display); }
+
+@media (max-width: 700px) {
+  .food-panel { width: 100%; padding: 14px 15px 16px; }
+  .food-stage video { max-height: 40dvh; }
+  .food-chip img { height: 48px; }
+}

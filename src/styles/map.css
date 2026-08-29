@@ -8,7 +8,12 @@
 .map-brand__status i { width: 7px; height: 7px; border-radius: 50%; background: var(--jade-bright); box-shadow: 0 0 0 5px rgba(101,201,184,.16); }
 .sound-toggle { display: block; width: 100%; margin-top: 14px; padding: 8px 10px; border: 1px solid rgba(31,119,112,.22); border-radius: 8px; background: rgba(31,119,112,.08); cursor: pointer; font-size: 12px; font-weight: 650; }
 .sound-toggle[aria-pressed="true"] { color: var(--jade); }
-.spot-dock { position: absolute; z-index: 1000; bottom: 24px; left: 24px; width: 292px; max-height: calc(100dvh - 220px); padding: 16px; overflow: hidden; border-radius: 18px 18px 4px 18px; }
+.spot-dock-wrap { position: absolute; z-index: 1000; bottom: 24px; left: 24px; display: flex; align-items: flex-end; gap: 10px; }
+.dock-tab { display: flex; flex: 0 0 auto; align-items: center; gap: 9px; padding: 13px 15px; border: 0; border-radius: 16px 16px 3px 16px; cursor: pointer; font: 650 12px var(--display); letter-spacing: .04em; }
+.dock-tab__icon { display: inline-block; color: var(--jade); transition: transform .32s cubic-bezier(.32,.72,.3,1); }
+.spot-dock-wrap.is-open .dock-tab__icon { transform: rotate(90deg); }
+.spot-dock { width: 292px; max-height: calc(100dvh - 220px); padding: 16px; overflow: hidden; border-radius: 18px 18px 4px 18px; transition: opacity .3s, transform .32s cubic-bezier(.32,.72,.3,1); }
+.spot-dock-wrap:not(.is-open) .spot-dock { pointer-events: none; opacity: 0; transform: translateX(-14px) scale(.97); }
 .spot-dock__title { margin: 0 8px 9px; color: var(--ink-soft); font-size: 10px; font-weight: 750; letter-spacing: .15em; }
 .spot-dock__list { max-height: min(48dvh, 455px); overflow: auto; scrollbar-width: thin; }
 .spot-row { display: flex; width: 100%; align-items: center; gap: 11px; padding: 8px; border: 0; border-radius: 9px; text-align: left; background: transparent; cursor: pointer; transition: background .2s, transform .2s; }
@@ -25,9 +30,11 @@
 .sound-marker { overflow: visible !important; border: 0 !important; background: none !important; }
 .sound-marker__pin { position: absolute; inset: 6px; z-index: 2; display: grid; place-items: center; border: 3px solid white; border-radius: 50%; color: white; background: var(--spot); box-shadow: 0 5px 16px rgba(9,35,32,.32); font: 700 13px var(--display); transition: transform .2s; }
 .sound-marker__wave { position: absolute; inset: 2px; border: 1.5px solid var(--spot); border-radius: 50%; opacity: 0; }
-.sound-marker:hover .sound-marker__pin, .sound-marker:focus .sound-marker__pin { transform: scale(1.12); }
-.sound-marker:hover .sound-marker__wave, .sound-marker:focus .sound-marker__wave { animation: sound-wave 1.35s ease-out infinite; }
+.sound-marker:hover .sound-marker__pin, .sound-marker:focus .sound-marker__pin, .sound-marker.is-highlighted .sound-marker__pin { transform: scale(1.18); }
+.sound-marker:hover .sound-marker__wave, .sound-marker:focus .sound-marker__wave, .sound-marker.is-highlighted .sound-marker__wave { animation: sound-wave 1.35s ease-out infinite; }
 @keyframes sound-wave { from { opacity: .65; transform: scale(.75); } to { opacity: 0; transform: scale(1.65); } }
+.sound-marker--food .sound-marker__pin { border-radius: 14px 14px 14px 3px; box-shadow: 0 6px 20px color-mix(in srgb, var(--spot), transparent 45%); }
+.sound-marker--food .sound-marker__wave { border-radius: 14px; }
 .spot-tooltip { padding: 0 !important; overflow: hidden; border: 0 !important; border-radius: 15px !important; background: white !important; box-shadow: 0 18px 45px rgba(7,31,28,.25) !important; }
 .spot-tooltip::before { display: none; }
 .spot-preview { width: 294px; white-space: normal; }
@@ -41,7 +48,10 @@
   .map-brand { top: 12px; left: 12px; width: 218px; padding: 15px 17px; }
   .map-brand h1 { font-size: 28px; }
   .map-brand__status { display: none; }
-  .spot-dock { right: 0; bottom: 10px; left: 0; width: auto; max-height: none; margin: 0 10px; padding: 9px; border-radius: 15px; }
+  .spot-dock-wrap { right: 0; bottom: 10px; left: 0; flex-direction: column; align-items: stretch; gap: 6px; margin: 0 10px; }
+  .dock-tab { align-self: flex-start; padding: 9px 13px; border-radius: 13px; }
+  .spot-dock { width: auto; max-height: none; padding: 9px; border-radius: 15px; }
+  .spot-dock-wrap:not(.is-open) .spot-dock { display: none; }
   .spot-dock__title { display: none; }
   .spot-dock__list { display: flex; max-height: none; gap: 4px; overflow-x: auto; }
   .spot-row { min-width: 128px; }
