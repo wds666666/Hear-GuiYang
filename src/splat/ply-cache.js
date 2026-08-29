@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hear-guiyang-ply-v1';
+const CACHE_NAME = 'hear-guiyang-assets-v1';
 const blobs = new Map();
 const inflight = new Map();
 

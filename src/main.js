@@ -16,6 +16,10 @@ import { renderSubSpotPage } from './pages/subspot-page.js';
 
 const root = document.querySelector('#app');
 
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => {});
+}
+
 createRouter(async (route) => {
   const spot = route.id ? getSpot(route.id) : null;
   window.scrollTo(0, 0);
