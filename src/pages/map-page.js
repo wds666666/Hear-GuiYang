@@ -1,5 +1,11 @@
 import { createMap } from '../map/create-map.js';
 
+const audio = new Audio();
+audio.loop = true;
+audio.volume = .42;
+audio.playsInline = true;
+let soundReady = false;
+
 export function renderMapPage(root, spots, navigate) {
   root.innerHTML = `<section class="map-page">
     <div id="map" class="map-canvas" aria-label="贵阳景点地图"></div>
@@ -8,7 +14,7 @@ export function renderMapPage(root, spots, navigate) {
       <h1>听见贵阳</h1>
       <p>沿着经纬度，听见一座城。</p>
       <span class="map-brand__status"><i></i> ${spots.length} 个声音坐标</span>
-      <button type="button" class="sound-toggle" data-sound aria-pressed="false">开启声音</button>
+      <button type="button" class="sound-toggle" data-sound aria-pressed="${soundReady}">${soundReady ? '声音已开' : '开启声音'}</button>
     </header>
     <aside class="spot-dock glass-panel" aria-label="景点列表">
       <p class="spot-dock__title">选择一个坐标</p>
@@ -23,12 +29,11 @@ export function renderMapPage(root, spots, navigate) {
     <div class="map-note glass-panel"><span class="map-note__pulse"></span><span>悬停标记试听<br><small>点击进入完整体验</small></span></div>
   </section>`;
 
-  const audio = new Audio();
-  audio.loop = true;
-  audio.volume = .42;
   let activeSpot = null;
+  let live = true;
   const soundBtn = root.querySelector('[data-sound]');
   const markSoundOn = () => {
+    soundReady = true;
     soundBtn.textContent = '声音已开';
     soundBtn.setAttribute('aria-pressed', 'true');
   };
@@ -36,8 +41,15 @@ export function renderMapPage(root, spots, navigate) {
   const preview = (spot) => {
     if (activeSpot?.id === spot.id && !audio.paused) return;
     activeSpot = spot;
-    audio.src = spot.audio.src;
-    audio.play().then(markSoundOn).catch(() => {});
+    audio.src = `${import.meta.env.BASE_URL}${spot.audio.src.replace(/^\//, '')}`;
+    audio.play().then(() => {
+      soundReady = true;
+      if (!live) {
+        audio.pause();
+        return;
+      }
+      markSoundOn();
+    }).catch(() => {});
     root.querySelectorAll('.spot-row').forEach((row) => row.classList.toggle('is-active', row.dataset.spot === spot.id));
   };
   const endPreview = (spot) => {
@@ -69,10 +81,16 @@ export function renderMapPage(root, spots, navigate) {
     listeners.push([row, enter, leave, click]);
   });
 
-  const armSound = () => {
-    const spot = activeSpot || spots[0];
-    audio.src = spot.audio.src;
+  const unlock = () => {
+    if (soundReady) return;
+    if (!audio.src) audio.src = `${import.meta.env.BASE_URL}${(activeSpot || spots[0]).audio.src.replace(/^\//, '')}`;
     audio.play().then(() => {
+      soundReady = true;
+      if (!live) {
+        audio.pause();
+        audio.currentTime = 0;
+        return;
+      }
       markSoundOn();
       if (!activeSpot) {
         audio.pause();
@@ -80,10 +98,13 @@ export function renderMapPage(root, spots, navigate) {
       }
     }).catch(() => {});
   };
-  soundBtn.addEventListener('click', armSound);
+  soundBtn.addEventListener('click', unlock);
+  root.addEventListener('pointerdown', unlock, true);
 
   return () => {
-    soundBtn.removeEventListener('click', armSound);
+    live = false;
+    soundBtn.removeEventListener('click', unlock);
+    root.removeEventListener('pointerdown', unlock, true);
     listeners.forEach(([row, enter, leave, click]) => {
       row.removeEventListener('mouseenter', enter);
       row.removeEventListener('focus', enter);
@@ -92,7 +113,7 @@ export function renderMapPage(root, spots, navigate) {
       row.removeEventListener('click', click);
     });
     audio.pause();
-    audio.src = '';
+    audio.currentTime = 0;
     mapController.destroy();
   };
 }

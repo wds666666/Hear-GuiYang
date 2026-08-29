@@ -24,7 +24,7 @@ export function renderSpotPage(root, spot, navigate) {
           <span class="experience-card__icon" aria-hidden="true">◖</span>
           <p class="eyebrow">SOUND</p><h3>听见此地</h3>
           <p>戴上耳机，让一段环境声把你带到现场。</p>
-          <audio controls preload="metadata" src="${spot.audio.src}"></audio>
+          <audio controls preload="metadata" src="${import.meta.env.BASE_URL}${spot.audio.src.replace(/^\//, '')}"></audio>
         </section>
         <section class="experience-card">
           <span class="experience-card__icon" aria-hidden="true">▶</span>

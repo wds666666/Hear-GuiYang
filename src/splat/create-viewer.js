@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import * as GaussianSplats3D from '@mkkellogg/gaussian-splats-3d';
 import { FirstPersonControls } from './controls.js';
 import { measureScene } from './bounds.js';
+import { cachedPlyUrl } from './ply-cache.js';
 
 const PIXEL_RATIO = Math.min(window.devicePixelRatio || 1, 2);
 const MAX_STEP = 1 / 30;
@@ -9,6 +10,7 @@ const DEFAULT_UP = [0, -1, 0];
 const STATUS = { 0: '下载中', 1: '解析中', 2: '完成' };
 
 export async function createSplatViewer({ stage, spot, onProgress, onStats, onView }) {
+  const plyUrl = await cachedPlyUrl(spot.splat.src, onProgress);
   const renderer = new THREE.WebGLRenderer({
     antialias: false, precision: 'highp', powerPreference: 'high-performance',
   });
@@ -37,15 +39,19 @@ export async function createSplatViewer({ stage, spot, onProgress, onStats, onVi
   controls.onSpeedChange = (speed) => onStats({ speed });
   if (spot.splat.camera) controls.setView(spot.splat.camera);
 
-  await viewer.addSplatScene(spot.splat.src, {
-    format: GaussianSplats3D.SceneFormat.Ply,
-    splatAlphaRemovalThreshold: 1,
-    showLoadingUI: false,
-    progressiveLoad: false,
-    onProgress: (percent, label, status) => {
-      onProgress(percent, `${STATUS[status] ?? ''} ${label ?? ''}`.trim());
-    },
-  });
+  try {
+    await viewer.addSplatScene(plyUrl, {
+      format: GaussianSplats3D.SceneFormat.Ply,
+      splatAlphaRemovalThreshold: 1,
+      showLoadingUI: false,
+      progressiveLoad: false,
+      onProgress: (percent, label, status) => {
+        onProgress(percent, `${STATUS[status] ?? ''} ${label ?? ''}`.trim());
+      },
+    });
+  } finally {
+    URL.revokeObjectURL(plyUrl);
+  }
 
   const info = measureScene(viewer);
   camera.far = Math.max(500, info.radius * 40);
