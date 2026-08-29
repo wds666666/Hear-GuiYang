@@ -1,6 +1,6 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { wgs84ToGcj02 } from './china-coordinates.js';
+import { wgs84ToGcj02, gcj02ToWgs84 } from './china-coordinates.js';
 import { spotPreview } from '../components/spot-preview.js';
 
 const GUIYANG_CENTER = [26.578, 106.713];
@@ -18,10 +18,10 @@ export function createMap({
   element, spots, onSelect, onPreview, onPreviewEnd,
   center = GUIYANG_CENTER, zoom = 12, fit = false, color, extraMarkers = [],
 }) {
-  let useAmap = true;
+  let useAmap = false;
   const coordinates = (item) => (useAmap ? wgs84ToGcj02(item.lat, item.lng) : [item.lat, item.lng]);
 
-  const map = L.map(element, { zoomControl: false }).setView(wgs84ToGcj02(center[0], center[1]), zoom);
+  const map = L.map(element, { zoomControl: false }).setView(center, zoom);
   L.control.zoom({ position: 'topright' }).addTo(map);
 
   const amap = L.tileLayer(
@@ -31,8 +31,8 @@ export function createMap({
   const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19, attribution: '© OpenStreetMap', crossOrigin: true,
   });
-  amap.addTo(map);
-  L.control.layers({ '高德地图': amap, 'OpenStreetMap': osm }, null, { position: 'topright' }).addTo(map);
+  osm.addTo(map);
+  L.control.layers({ 'OpenStreetMap': osm, '高德地图': amap }, null, { position: 'topright' }).addTo(map);
 
   const placed = [];
   const markerById = new Map();
@@ -75,9 +75,21 @@ export function createMap({
     map.fitBounds(L.latLngBounds(spots.map(coordinates)), { padding: [110, 110], maxZoom: 17 });
   }
 
-  map.on('baselayerchange', (event) => {
-    useAmap = event.name === '高德地图';
+  const applyBase = (amapOn) => {
+    if (useAmap === amapOn) return;
+    const { lat, lng } = map.getCenter();
+    const z = map.getZoom();
+    useAmap = amapOn;
+    map.setView(amapOn ? wgs84ToGcj02(lat, lng) : gcj02ToWgs84(lat, lng), z, { animate: false });
     placed.forEach(([item, marker]) => marker.setLatLng(coordinates(item)));
+  };
+
+  map.on('baselayerchange', (event) => applyBase(event.name === '高德地图'));
+  let osmFails = 0;
+  osm.on('tileerror', () => {
+    if (useAmap || ++osmFails < 4) return;
+    map.removeLayer(osm);
+    amap.addTo(map);
   });
 
   return {

@@ -57,7 +57,11 @@ export const spots = [
     id: 'qingyun-market', order: 3, name: '青云市集', icon: '集', color: '#bd477f', lat: 26.5665, lng: 106.7159,
     description: '南明区青云路市集，复古霓虹、贵州小吃与文创小店，夜里最热闹。',
     image: '/assets/images/qingyun-market.jpg', imageCredit: '本地占位图',
-    audio: rec('qingyun-market/main'), vlog: clip('qingyun-market/main'), splat: unavailableSplat,
+    audio: rec('qingyun-market/main'), vlog: clip('qingyun-market/main'),
+    splat: {
+      status: 'ready', src: '/assets/splats/qingyun-market.ply', up: [0, 1, 0],
+      camera: { position: [2.7626, 0.5873, 1.2972], yaw: 1.0540, pitch: 0.0200 },
+    },
     subSpots: [
       {
         id: 'main', name: '市集主街', icon: '街', lat: 26.5668, lng: 106.7156,

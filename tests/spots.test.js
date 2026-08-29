@@ -45,9 +45,9 @@ test('all declared local media exists', () => {
   }
 });
 
-test('five splat scenes are ready and never reference ref', () => {
+test('six splat scenes are ready and never reference ref', () => {
   const ready = spots.filter((spot) => spot.splat.status === 'ready');
-  assert.equal(ready.length, 5);
+  assert.equal(ready.length, 6);
   for (const file of ['src/data/spots.js', 'src/data/food.js']) {
     assert.equal(readFileSync(resolve(root, file), 'utf8').includes('/ref/'), false, `${file} references ref`);
   }
@@ -64,6 +64,7 @@ test('splat up axes match the measured values from the reference viewer', () => 
     'guizhou-museum': [0, 0, 1],
     'huangguoshu-waterfall': [0, -1, 0],
     ayunduocang: [-1, 0, 0],
+    'qingyun-market': [0, 1, 0],
   };
   for (const [id, up] of Object.entries(expected)) {
     assert.deepEqual(spots.find((spot) => spot.id === id).splat.up, up, `wrong up axis for ${id}`);

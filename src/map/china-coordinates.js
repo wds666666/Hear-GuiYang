@@ -18,3 +18,14 @@ export function wgs84ToGcj02(lat, lng) {
   const s = Math.sqrt(m);
   return [lat + dLat*180/((a*(1-ee))/(m*s)*pi), lng + dLng*180/(a/s*Math.cos(rad)*pi)];
 }
+
+export function gcj02ToWgs84(lat, lng) {
+  let wlat = lat;
+  let wlng = lng;
+  for (let i = 0; i < 4; i++) {
+    const [glat, glng] = wgs84ToGcj02(wlat, wlng);
+    wlat -= glat - lat;
+    wlng -= glng - lng;
+  }
+  return [wlat, wlng];
+}

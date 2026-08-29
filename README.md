@@ -22,7 +22,7 @@ npm run build
          ──点击「贵阳美食」──► 右侧抽屉，默认自动播 Vlog
 ```
 
-有二级地图的景点：青云市集、阿云朵仓、黔灵山。高斯场景目前 5 个：甲秀楼、黔灵山、阿云朵仓、贵州博物馆、黄果树。
+有二级地图的景点：青云市集、阿云朵仓、黔灵山。高斯场景目前 6 个：甲秀楼、黔灵山、阿云朵仓、贵州博物馆、黄果树、青云市集。
 
 ## 技术架构
 
@@ -54,7 +54,7 @@ index.html
 
 ### 地图
 
-`src/map/create-map.js`：Leaflet 1.9，默认高德、OSM 备选。景点坐标是 WGS84；高德底图用 `wgs84ToGcj02`。切底图时所有 marker 同步换算。悬停走 Leaflet tooltip，点击走 `navigate`。
+`src/map/create-map.js`：Leaflet 1.9，默认 OpenStreetMap、高德备选（OSM 瓦片失败则自动切高德）。景点坐标是 WGS84；高德底图用 `wgs84ToGcj02`。切底图时地图中心与 marker 同步换算。悬停走 Leaflet tooltip，点击走 `navigate`。
 
 美食是 `extraMarkers`，不进景点列表，点开 `createFoodPanel`。
 
