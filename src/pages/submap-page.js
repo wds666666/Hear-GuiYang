@@ -42,6 +42,7 @@ export function renderSubMapPage(root, spot, navigate) {
   let live = true;
 
   const preview = (sub) => {
+    if (!sub.audio?.src) return;
     if (activeSub?.id === sub.id && !audio.paused) return;
     activeSub = sub;
     audio.src = asset(sub.audio.src);
@@ -73,8 +74,8 @@ export function renderSubMapPage(root, spot, navigate) {
     image: sub.image,
     audio: sub.audio,
     vlog: sub.vlog,
-    splat: spot.splat,
-    splatNote: `小景点共用${spot.name}的高斯重建场景，可自由漫游整片区域。`,
+    splat: sub.splat ?? spot.splat,
+    splatNote: sub.splatNote ?? `小景点共用${spot.name}的高斯重建场景，可自由漫游整片区域。`,
     color: spot.color,
   });
 

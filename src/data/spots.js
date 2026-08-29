@@ -1,5 +1,6 @@
 // status: ready 表示该地实拍/实录素材，placeholder 表示通用占位环境音，unavailable 表示尚未采集。
 const ambience = { status: 'placeholder', src: '/assets/audio/guiyang-ambience.wav' };
+const noAudio = { status: 'unavailable', src: null };
 const noVlog = { status: 'unavailable', src: null, poster: null };
 const unavailableSplat = { status: 'unavailable', src: null };
 
@@ -25,33 +26,49 @@ export const spots = [
   {
     id: 'qianling-mountain', order: 2, name: '黔灵山', icon: '山', color: '#39795b', lat: 26.5986, lng: 106.6917,
     pixel: { x: 2771, y: 3509 },
-    description: '城中山林公园，猕猴、弘福寺与黔灵湖共生，可半日登高望远。',
-    image: '/assets/images/qianling-mountain.jpg', imageCredit: '本地占位图',
-    audio: ambience, vlog: noVlog,
+    description: '城中山林公园，猕猴、纪念碑、动物园、弘福寺与麒麟洞，可半日走完。',
+    illustratedMap: { src: '/assets/images/maps/qianling-illustrated.jpg', width: 1893, height: 2524 },
+    image: '/assets/images/posters/qianling-mountain/macaque-area.jpg', imageCredit: 'Vlog 抽帧',
+    audio: rec('qianling-mountain/macaque-area'), vlog: clip('qianling-mountain/macaque-area'),
     splat: {
       status: 'ready', src: '/assets/splats/qianling-mountain.ply', up: [0, 0, 1],
       camera: { position: [-0.1818, -2.6152, 5.4354], yaw: -3.504, pitch: -0.82 },
     },
     subSpots: [
       {
+        id: 'macaque-area', name: '猕猴区', icon: '猴', lat: 26.5978, lng: 106.6952,
+        pixel: { x: 1020, y: 820 },
+        description: '园中猕猴成群的地段，是黔灵山最热闹的野生角落。',
+        image: '/assets/images/posters/qianling-mountain/macaque-area.jpg',
+        audio: rec('qianling-mountain/macaque-area'), vlog: clip('qianling-mountain/macaque-area'),
+      },
+      {
+        id: 'monument', name: '纪念碑', icon: '碑', lat: 26.5945, lng: 106.6888,
+        pixel: { x: 780, y: 1480 },
+        description: '解放贵州革命烈士纪念碑，松柏之间一段更安静的放松角落。',
+        image: '/assets/images/posters/qianling-mountain/monument.jpg',
+        audio: rec('qianling-mountain/monument'), vlog: clip('qianling-mountain/monument'),
+      },
+      {
+        id: 'zoo', name: '动物园', icon: '园', lat: 26.6008, lng: 106.6935,
+        pixel: { x: 1380, y: 1664 },
+        description: '杖钵峰台地上的园中园，熊猫与珍禽藏在山林里。',
+        image: '/assets/images/posters/qianling-mountain/zoo.jpg',
+        audio: rec('qianling-mountain/zoo'), vlog: clip('qianling-mountain/zoo'),
+      },
+      {
         id: 'hongfu-temple', name: '弘福寺', icon: '寺', lat: 26.5952, lng: 106.6938,
+        pixel: { x: 1081, y: 1770 },
         description: '山腰的明代古刹，钟声与香火在林间散开。',
-        image: '/assets/images/qianling-mountain.jpg', audio: ambience, vlog: noVlog,
+        image: '/assets/images/posters/qianling-mountain/hongfu-temple.jpg',
+        audio: noAudio, vlog: noVlog, splat: unavailableSplat,
       },
       {
-        id: 'qianling-lake', name: '黔灵湖', icon: '湖', lat: 26.5961, lng: 106.6875,
-        description: '山谷中的人工湖，环湖步道是清晨最安静的一段。',
-        image: '/assets/images/qianling-mountain.jpg', audio: ambience, vlog: noVlog,
-      },
-      {
-        id: 'macaque-trail', name: '猕猴九曲径', icon: '径', lat: 26.5978, lng: 106.6952,
-        description: '通往山顶的九曲径，沿途猕猴成群，走走停停要看它们脸色。',
-        image: '/assets/images/qianling-mountain.jpg', audio: ambience, vlog: noVlog,
-      },
-      {
-        id: 'xiangwang-ridge', name: '象王岭', icon: '岭', lat: 26.6015, lng: 106.6925,
-        description: '黔灵山主峰一带，登顶可俯瞰整座贵阳城。',
-        image: '/assets/images/qianling-mountain.jpg', audio: ambience, vlog: noVlog,
+        id: 'qilin-cave', name: '麒麟洞', icon: '洞', lat: 26.5938, lng: 106.6955,
+        pixel: { x: 1480, y: 2180 },
+        description: '狮子岩下的溶洞，张学良、杨虎城曾被囚于此。',
+        image: '/assets/images/posters/qianling-mountain/qilin-cave.jpg',
+        audio: rec('qianling-mountain/qilin-cave'), vlog: clip('qianling-mountain/qilin-cave'),
       },
     ],
   },
@@ -217,3 +234,4 @@ export function hasSubMap(spot) {
 export function getSubSpot(spot, subId) {
   return spot?.subSpots?.find((sub) => sub.id === subId);
 }
+

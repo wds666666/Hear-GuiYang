@@ -18,7 +18,7 @@ test('contains ten uniquely identified spots', () => {
 test('only the three planned spots have a sub map', () => {
   const withSubMap = spots.filter(hasSubMap).map((spot) => spot.id).sort();
   assert.deepEqual(withSubMap, ['ayunduocang', 'qianling-mountain', 'qingyun-market']);
-  assert.deepEqual(spots.filter(hasSubMap).map((spot) => spot.subSpots.length), [4, 4, 7]);
+  assert.deepEqual(spots.filter(hasSubMap).map((spot) => spot.subSpots.length), [5, 4, 7]);
 });
 
 test('sub spot ids are unique within a spot and resolvable', () => {

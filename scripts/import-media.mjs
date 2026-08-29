@@ -36,6 +36,15 @@ const clips = [
   ['美食-贵州酸汤火锅2.28', '贵州酸汤火锅2.28', 'food/suantang-hotpot'],
 ];
 
+// 黔灵山四点不在「真实录制」总目录里，各自一个文件夹。
+const qianlingDir = resolve(root, 'ref/音频以及vlog');
+const qianlingClips = [
+  ['黔灵山公园cill放松人民', 'qianling-mountain/monument'],
+  ['黔灵山公园动物园', 'qianling-mountain/zoo'],
+  ['黔灵山猕猴区', 'qianling-mountain/macaque-area'],
+  ['黔灵山麒麟洞', 'qianling-mountain/qilin-cave'],
+];
+
 const splats = [['ref/3dGS/阿云朵仓.ply', 'assets/splats/ayunduocang.ply']];
 
 // AI 想象音轨：整段 wav 拷入 lab 目录，供地图页「声音实验室」融合播放。
@@ -102,6 +111,26 @@ async function main() {
       posterCount += 1;
     } else {
       missing.push(`${folder}/${base}.mp4`);
+    }
+  }
+
+  for (const [base, slug] of qianlingClips) {
+    const folder = resolve(qianlingDir, base);
+    const srcAudio = resolve(folder, `${base}.mp3`);
+    const srcVideo = resolve(folder, `${base}.mp4`);
+    const outAudio = resolve(publicDir, `assets/audio/${slug}.mp3`);
+    const outVideo = resolve(publicDir, `assets/video/${slug}.mp4`);
+    const outPoster = resolve(publicDir, `assets/images/posters/${slug}.jpg`);
+
+    if (await copyInto(srcAudio, outAudio)) audioCount += 1;
+    else missing.push(`${base}.mp3`);
+
+    if (await copyInto(srcVideo, outVideo)) {
+      videoCount += 1;
+      await extractPoster(outVideo, outPoster);
+      posterCount += 1;
+    } else {
+      missing.push(`${base}.mp4`);
     }
   }
 
