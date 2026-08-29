@@ -19,13 +19,16 @@
 
 .food-switch { display: flex; margin-top: auto; padding-top: 16px; gap: 9px; }
 .food-chip { display: flex; overflow: hidden; width: 100%; flex-direction: column; align-items: stretch; padding: 0; border: 2px solid transparent; border-radius: 12px; background: rgba(16,38,36,.05); cursor: pointer; transition: border-color .2s, transform .2s; }
-.food-chip:hover { transform: translateY(-2px); }
+@media (hover: hover) {
+  .food-chip:hover { transform: translateY(-2px); }
+}
 .food-chip[aria-selected="true"] { border-color: var(--jade); }
 .food-chip img { width: 100%; height: 62px; object-fit: cover; }
 .food-chip span { padding: 7px 4px; font: 600 12px var(--display); }
 
-@media (max-width: 700px) {
-  .food-panel { width: 100%; padding: 14px 15px 16px; }
-  .food-stage video { max-height: 40dvh; }
+@media (max-width: 700px), (max-height: 540px) {
+  .food-panel { width: 100%; overflow-y: auto; padding: calc(14px + var(--safe-top)) 15px calc(16px + var(--safe-bottom)); }
+  .food-stage video { max-height: min(36dvh, 280px); }
   .food-chip img { height: 48px; }
+  .food-chip { min-height: 44px; }
 }

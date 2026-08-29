@@ -29,10 +29,10 @@
 .splat-camera__btn:hover { color: #fff; background: rgba(31,119,112,.35); }
 .splat-help { position: absolute; z-index: 3; right: 24px; bottom: 22px; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px 18px; max-width: 520px; padding: 12px 16px; color: rgba(255,255,255,.58); background: rgba(7,16,15,.64); font-size: 9px; backdrop-filter: blur(12px); pointer-events: none; }
 kbd { margin-right: 5px; padding: 3px 6px; border: 1px solid rgba(255,255,255,.22); border-radius: 3px; color: white; background: rgba(255,255,255,.08); font-family: var(--body); }
-@media (max-width: 700px) {
-  .splat-topbar { top: 10px; right: 10px; left: 10px; }
+@media (max-width: 700px), (max-height: 540px) {
+  .splat-topbar { top: calc(10px + var(--safe-top)); right: 10px; left: 10px; }
   .splat-stats { display: none; }
-  .splat-camera { left: 10px; right: auto; bottom: 64px; width: min(240px, calc(100vw - 20px)); min-width: 0; }
-  .splat-help { right: 10px; bottom: 10px; left: 10px; justify-content: center; }
+  .splat-camera { left: 10px; right: auto; bottom: calc(64px + var(--safe-bottom)); width: min(240px, calc(100vw - 20px)); min-width: 0; }
+  .splat-help { right: 10px; bottom: calc(10px + var(--safe-bottom)); left: 10px; justify-content: center; }
   .splat-help span:nth-child(n+3) { display: none; }
 }

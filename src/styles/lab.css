@@ -29,10 +29,11 @@
 .lab-mix .primary-action { margin-top: 4px; }
 .lab-mix .primary-action[aria-pressed="true"] { background: var(--jade); }
 
-@media (max-width: 700px) {
-  .lab-tab { top: auto; bottom: 86px; right: 10px; padding: 10px 13px; border-radius: 13px; }
+@media (max-width: 700px), (max-height: 540px) {
+  .lab-tab { top: auto; bottom: calc(10px + var(--safe-bottom)); right: calc(10px + var(--safe-right)); min-height: 44px; padding: 10px 13px; border-radius: 13px; }
   .lab-tab.is-hidden { transform: translateX(10px); }
   .lab-tab:not(.is-hidden) { transform: none; }
-  .sound-lab { width: 100%; padding: 14px 15px 16px; }
-  .lab-list { max-height: 126px; }
+  .sound-lab { width: 100%; overflow-y: auto; padding: calc(14px + var(--safe-top)) 15px calc(16px + var(--safe-bottom)); }
+  .lab-list { max-height: min(126px, 22dvh); }
+  .lab-chip { min-height: 44px; }
 }
