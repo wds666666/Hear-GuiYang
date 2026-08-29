@@ -7,6 +7,7 @@ import './styles/splat.css';
 import './styles/submap.css';
 import './styles/food.css';
 import './styles/lab.css';
+import './styles/keepsake.css';
 import { spots, getSpot, getSubSpot, hasSubMap } from './data/spots.js';
 import { createRouter, navigate } from './router.js';
 import { renderMapPage } from './pages/map-page.js';

@@ -3,7 +3,10 @@ import { aiSounds, realSounds } from '../data/lab.js';
 
 // 地图页右侧的声音实验室抽屉：AI 想象 × 真实采集各选一条，
 // 两轨同时循环播放并各自控制音量，叠加成一段「融合」的贵阳。
-export function createSoundLab(host, { onPauseAmbient, onClose } = {}) {
+// 融合播放满这么久，就算「体验完成」，送一张纪念海报。
+const KEEPSAKE_DELAY = 5000;
+
+export function createSoundLab(host, { onPauseAmbient, onClose, onKeepsake } = {}) {
   const groups = [
     { key: 'ai', label: 'AI 想象', sounds: aiSounds },
     { key: 'real', label: '真实采集', sounds: realSounds },
@@ -31,6 +34,7 @@ export function createSoundLab(host, { onPauseAmbient, onClose } = {}) {
     <label><span>AI 想象</span><input type="range" min="0" max="1" step="0.01" value="0.75" data-vol="ai"><i>75%</i></label>
     <label><span>真实采集</span><input type="range" min="0" max="1" step="0.01" value="0.75" data-vol="real"><i>75%</i></label>
     <button type="button" class="primary-action" data-play disabled>播放融合</button>
+    <button type="button" class="lab-keepsake" data-keepsake hidden>领取声音纪念海报</button>
   </div>`;
   host.appendChild(panel);
 
@@ -50,9 +54,28 @@ export function createSoundLab(host, { onPauseAmbient, onClose } = {}) {
   let playing = false;
 
   const playBtn = panel.querySelector('[data-play]');
+  const keepsakeBtn = panel.querySelector('[data-keepsake]');
   const nowLine = panel.querySelector('[data-now]');
   const volInputs = [...panel.querySelectorAll('[data-vol]')];
   const chips = [...panel.querySelectorAll('.lab-chip')];
+
+  let keepsakeTimer = 0;
+  const mixLabel = () => `${selection.ai?.name ?? ''} × ${selection.real?.name ?? ''}`;
+  const clearKeepsakeTimer = () => {
+    clearTimeout(keepsakeTimer);
+    keepsakeTimer = 0;
+  };
+  // 融合满 5 秒算体验完成：先停下声音再弹海报，重新播一次可以再领一张。
+  const armKeepsake = () => {
+    clearKeepsakeTimer();
+    keepsakeTimer = setTimeout(() => {
+      keepsakeTimer = 0;
+      if (!playing) return;
+      stop();
+      keepsakeBtn.hidden = false;
+      onKeepsake?.(mixLabel());
+    }, KEEPSAKE_DELAY);
+  };
 
   const refresh = () => {
     const ready = Boolean(selection.ai && selection.real);
@@ -66,6 +89,7 @@ export function createSoundLab(host, { onPauseAmbient, onClose } = {}) {
 
   const stop = () => {
     playing = false;
+    clearKeepsakeTimer();
     for (const el of [aiAudio, realAudio]) {
       el.pause();
       el.currentTime = 0;
@@ -87,11 +111,15 @@ export function createSoundLab(host, { onPauseAmbient, onClose } = {}) {
     aiAudio.play().catch(() => {});
     realAudio.play().catch(() => {});
     playing = true;
+    armKeepsake();
     refresh();
   };
 
   const onPlayClick = () => (playing ? stop() : play());
   playBtn.addEventListener('click', onPlayClick);
+
+  const onKeepsakeClick = () => onKeepsake?.(mixLabel());
+  keepsakeBtn.addEventListener('click', onKeepsakeClick);
 
   const onChipClick = (event) => {
     const chip = event.currentTarget;
@@ -158,6 +186,7 @@ export function createSoundLab(host, { onPauseAmbient, onClose } = {}) {
       window.removeEventListener('keydown', onKey);
       closeBtn.removeEventListener('click', close);
       playBtn.removeEventListener('click', onPlayClick);
+      keepsakeBtn.removeEventListener('click', onKeepsakeClick);
       chips.forEach((chip) => chip.removeEventListener('click', onChipClick));
       volInputs.forEach((input) => input.removeEventListener('input', onVolume));
       panel.remove();

@@ -4,6 +4,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { spots, getSubSpot, hasSubMap } from '../src/data/spots.js';
 import { foods, foodMarker } from '../src/data/food.js';
+import { keepsakePosters } from '../src/data/keepsake.js';
 
 const root = resolve(import.meta.dirname, '..');
 const publicPath = (url) => resolve(root, 'public', url.replace(/^\//, ''));
@@ -69,6 +70,15 @@ test('splat up axes match the measured values from the reference viewer', () => 
   };
   for (const [id, up] of Object.entries(expected)) {
     assert.deepEqual(spots.find((spot) => spot.id === id).splat.up, up, `wrong up axis for ${id}`);
+  }
+});
+
+test('keepsake posters have unique ids and existing files', () => {
+  assert.ok(keepsakePosters.length > 0);
+  assert.equal(new Set(keepsakePosters.map((poster) => poster.id)).size, keepsakePosters.length);
+  for (const poster of keepsakePosters) {
+    assert.ok(poster.src.startsWith('/assets/images/keepsake/'), `unexpected path ${poster.src}`);
+    assert.ok(exists(poster.src), `missing ${poster.src}`);
   }
 });
 

@@ -2,6 +2,7 @@ import { createMap } from '../map/create-map.js';
 import { createImageMap } from '../map/create-image-map.js';
 import { createFoodPanel } from '../components/food-panel.js';
 import { createSoundLab } from '../components/sound-lab.js';
+import { createKeepsake } from '../components/keepsake.js';
 import { createExperienceOverlay } from '../components/experience-overlay.js';
 import { foodMarker } from '../data/food.js';
 import { asset } from '../assets.js';
@@ -109,16 +110,19 @@ export function renderMapPage(root, spots, navigate) {
   };
 
   const foodPanel = createFoodPanel(page);
+  const keepsake = createKeepsake(page);
   // 声音实验室与地图环境声、美食抽屉互斥：融合播放时停掉悬停试听。
   const soundLab = createSoundLab(page, {
     onPauseAmbient: () => audio.pause(),
     onClose: () => setLabOpen(false),
+    onKeepsake: (mix) => keepsake.open(mix),
   });
   const overlay = createExperienceOverlay(page, {
     onOpen: () => {
       audio.pause();
       foodPanel.close();
       soundLab.close();
+      keepsake.close();
       setLabOpen(false);
     },
     onSplat: (item) => navigate(`/spot/${item.id}/splat`),
@@ -285,6 +289,7 @@ export function renderMapPage(root, spots, navigate) {
     root.querySelectorAll('[data-scheme]').forEach((btn) => btn.removeEventListener('click', onScheme));
     pickBtn.removeEventListener('click', onPickToggle);
     soundLab.destroy();
+    keepsake.destroy();
     foodPanel.destroy();
     overlay.destroy();
     illustratedMap.destroy();
