@@ -1,6 +1,7 @@
 import { createMap } from '../map/create-map.js';
 import { createFoodPanel } from '../components/food-panel.js';
 import { createSoundLab } from '../components/sound-lab.js';
+import { createExperienceOverlay } from '../components/experience-overlay.js';
 import { foodMarker } from '../data/food.js';
 import { asset } from '../assets.js';
 
@@ -11,12 +12,24 @@ audio.playsInline = true;
 let soundReady = false;
 let dockOpen = false;
 
+const UNRECORDED = '#8a918e';
+
+function isUnrecorded(spot) {
+  return !spot.subSpots?.length && spot.vlog.status !== 'ready' && spot.splat.status !== 'ready';
+}
+
 function spotHint(spot) {
+  if (isUnrecorded(spot)) return '尚未录制';
   if (spot.subSpots?.length) return `小地图 · ${spot.subSpots.length} 个声音角落`;
   const parts = ['声音'];
   if (spot.vlog.status === 'ready') parts.push('Vlog');
   if (spot.splat.status === 'ready') parts.push('3D');
   return parts.join(' · ');
+}
+
+function mapSpot(spot) {
+  if (!isUnrecorded(spot)) return spot;
+  return { ...spot, color: UNRECORDED, previewEyebrow: '尚未录制', markerClass: 'sound-marker--pending' };
 }
 
 export function renderMapPage(root, spots, navigate) {
@@ -37,15 +50,15 @@ export function renderMapPage(root, spots, navigate) {
       <aside id="spot-dock" class="spot-dock glass-panel" aria-label="景点列表">
         <p class="spot-dock__title">选择一个坐标</p>
         <div class="spot-dock__list">
-          ${spots.map((spot) => `<button type="button" class="spot-row" data-spot="${spot.id}">
-            <span class="spot-row__dot" style="--spot:${spot.color}">${spot.icon}</span>
+          ${spots.map((spot) => `<button type="button" class="spot-row${isUnrecorded(spot) ? ' is-pending' : ''}" data-spot="${spot.id}">
+            <span class="spot-row__dot" style="--spot:${isUnrecorded(spot) ? UNRECORDED : spot.color}">${spot.icon}</span>
             <span><strong>${spot.name}</strong><small>${spotHint(spot)}</small></span>
             <span class="spot-row__arrow" aria-hidden="true">↗</span>
           </button>`).join('')}
         </div>
       </aside>
     </div>
-    <div class="map-note glass-panel"><span class="map-note__pulse"></span><span>悬停标记试听<br><small>点击进入完整体验</small></span></div>
+    <div class="map-note glass-panel"><span class="map-note__pulse"></span><span>悬停标记试听<br><small>点击打开体验</small></span></div>
     <button type="button" class="lab-tab glass-panel" data-lab-toggle aria-expanded="false" aria-controls="sound-lab">
       <span class="lab-tab__icon" aria-hidden="true">◉</span>
       <span>声音实验室</span>
@@ -99,6 +112,23 @@ export function renderMapPage(root, spots, navigate) {
     onPauseAmbient: () => audio.pause(),
     onClose: () => setLabOpen(false),
   });
+  const overlay = createExperienceOverlay(page, {
+    onOpen: () => {
+      audio.pause();
+      foodPanel.close();
+      soundLab.close();
+      setLabOpen(false);
+    },
+    onSplat: (item) => navigate(`/spot/${item.id}/splat`),
+  });
+
+  const openSpot = (spot) => {
+    if (spot.subSpots?.length) {
+      navigate(`/spot/${spot.id}/map`);
+      return;
+    }
+    overlay.open(spot);
+  };
   const onLabToggle = () => {
     const opening = labTab.getAttribute('aria-expanded') !== 'true';
     if (opening) {
@@ -113,8 +143,8 @@ export function renderMapPage(root, spots, navigate) {
   labTab.addEventListener('click', onLabToggle);
 
   const mapController = createMap({
-    element: root.querySelector('#map'), spots,
-    onSelect: (spot) => navigate(spot.subSpots?.length ? `/spot/${spot.id}/map` : `/spot/${spot.id}`),
+    element: root.querySelector('#map'), spots: spots.map(mapSpot),
+    onSelect: openSpot,
     onPreview: preview,
     onPreviewEnd: endPreview,
     extraMarkers: [{
@@ -146,7 +176,7 @@ export function renderMapPage(root, spots, navigate) {
     // 悬停：地图飞到该坐标、放大 marker，并弹出带图片和简介的浮窗试听。
     const enter = () => mapController.focus(spot);
     const leave = () => mapController.close(spot);
-    const click = () => navigate(spot.subSpots?.length ? `/spot/${spot.id}/map` : `/spot/${spot.id}`);
+    const click = () => openSpot(spot);
     row.addEventListener('mouseenter', enter);
     row.addEventListener('focus', enter);
     row.addEventListener('mouseleave', leave);
@@ -192,6 +222,7 @@ export function renderMapPage(root, spots, navigate) {
     labTab.removeEventListener('click', onLabToggle);
     soundLab.destroy();
     foodPanel.destroy();
+    overlay.destroy();
     mapController.destroy();
   };
 }

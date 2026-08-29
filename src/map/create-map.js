@@ -44,7 +44,7 @@ export function createMap({
       keyboard: true,
       icon: markerIcon(item),
     }).addTo(map);
-    marker.bindTooltip(spotPreview(item, options.eyebrow), {
+    marker.bindTooltip(spotPreview(item, item.previewEyebrow || options.eyebrow), {
       className: 'spot-tooltip', direction: 'top', offset: [0, -12], opacity: 1,
     });
     placed.push([item, marker]);

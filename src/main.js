@@ -2,6 +2,7 @@ import './styles/tokens.css';
 import './styles/base.css';
 import './styles/map.css';
 import './styles/spot.css';
+import './styles/overlay.css';
 import './styles/splat.css';
 import './styles/submap.css';
 import './styles/food.css';

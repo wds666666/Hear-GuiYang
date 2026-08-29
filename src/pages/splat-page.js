@@ -69,7 +69,7 @@ export function renderSplatPage(root, spot, navigate) {
   let cancelled = false;
   let copyTimer = 0;
 
-  const goBack = () => navigate(spot.subSpots?.length ? `/spot/${spot.id}/map` : `/spot/${spot.id}`);
+  const goBack = () => navigate(spot.subSpots?.length ? `/spot/${spot.id}/map` : '/');
   back.addEventListener('click', goBack);
 
   const copyView = async () => {

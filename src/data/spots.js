@@ -14,7 +14,7 @@ export const spots = [
   {
     id: 'jiaxiu-tower', order: 1, name: '甲秀楼', icon: '楼', color: '#c96332', lat: 26.5717, lng: 106.7214,
     description: '南明河上的明清古楼，翠微园拱桥与涵碧亭相映，是贵阳的城市地标。',
-    image: '/assets/images/jiaxiu-tower.jpg', imageCredit: '本地占位图',
+    image: '/assets/images/posters/spots/jiaxiu-tower.jpg', imageCredit: 'Vlog 抽帧',
     audio: rec('spots/jiaxiu-tower'), vlog: clip('spots/jiaxiu-tower'),
     splat: {
       status: 'ready', src: '/assets/splats/jiaxiu-tower.ply', up: [0, 0, 1],
@@ -56,7 +56,7 @@ export const spots = [
   {
     id: 'qingyun-market', order: 3, name: '青云市集', icon: '集', color: '#bd477f', lat: 26.5665, lng: 106.7159,
     description: '南明区青云路市集，复古霓虹、贵州小吃与文创小店，夜里最热闹。',
-    image: '/assets/images/qingyun-market.jpg', imageCredit: '本地占位图',
+    image: '/assets/images/posters/qingyun-market/main.jpg', imageCredit: 'Vlog 抽帧',
     audio: rec('qingyun-market/main'), vlog: clip('qingyun-market/main'),
     splat: {
       status: 'ready', src: '/assets/splats/qingyun-market.ply', up: [0, 1, 0],
@@ -86,7 +86,7 @@ export const spots = [
   {
     id: 'ayunduocang', order: 4, name: '阿云朵仓', icon: '艺', color: '#7254a3', lat: 26.6397, lng: 106.6466,
     description: '观山湖区文创社区，咖啡、手作与现场演出在旧空间里重新生长。',
-    image: '/assets/images/ayunduocang.jpg', imageCredit: '本地占位图',
+    image: '/assets/images/posters/ayunduocang/greenbelt.jpg', imageCredit: 'Vlog 抽帧',
     audio: rec('ayunduocang/greenbelt'), vlog: clip('ayunduocang/greenbelt'),
     splat: {
       status: 'ready', src: '/assets/splats/ayunduocang.ply', up: [-1, 0, 0],
@@ -145,7 +145,7 @@ export const spots = [
   {
     id: 'guizhou-museum', order: 5, name: '贵州博物馆', icon: '博', color: '#a33d68', lat: 26.6513, lng: 106.6389,
     description: '收藏贵州历史、民族与自然记忆，在一座馆里读懂多彩贵州。',
-    image: '/assets/images/guizhou-museum.jpg', imageCredit: '本地占位图',
+    image: '/assets/images/posters/spots/guizhou-museum.jpg', imageCredit: 'Vlog 抽帧',
     audio: rec('spots/guizhou-museum'), vlog: clip('spots/guizhou-museum'),
     splat: {
       status: 'ready', src: '/assets/splats/guizhou-museum.ply', up: [0, 0, 1],

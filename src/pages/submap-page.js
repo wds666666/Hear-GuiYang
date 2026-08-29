@@ -1,4 +1,5 @@
 import { createMap } from '../map/create-map.js';
+import { createExperienceOverlay } from '../components/experience-overlay.js';
 import { asset } from '../assets.js';
 
 const audio = new Audio();
@@ -54,7 +55,25 @@ export function renderSubMapPage(root, spot, navigate) {
     root.querySelector(`[data-sub="${sub.id}"]`)?.classList.remove('is-active');
   };
 
-  const openSub = (sub) => navigate(`/spot/${spot.id}/sub/${sub.id}`);
+  const overlay = createExperienceOverlay(root.querySelector('.submap-page'), {
+    onOpen: () => {
+      audio.pause();
+      audio.currentTime = 0;
+    },
+    onSplat: () => navigate(`/spot/${spot.id}/splat`),
+  });
+
+  const openSub = (sub) => overlay.open({
+    id: spot.id,
+    name: sub.name,
+    description: sub.description,
+    image: sub.image,
+    audio: sub.audio,
+    vlog: sub.vlog,
+    splat: spot.splat,
+    splatNote: `小景点共用${spot.name}的高斯重建场景，可自由漫游整片区域。`,
+    color: spot.color,
+  });
 
   const mapController = createMap({
     element: root.querySelector('#submap'),
@@ -103,6 +122,7 @@ export function renderSubMapPage(root, spot, navigate) {
     });
     audio.pause();
     audio.currentTime = 0;
+    overlay.destroy();
     mapController.destroy();
   };
 }
