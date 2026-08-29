@@ -19,21 +19,20 @@ function markerIcon(item) {
   });
 }
 
-function pixelToLatLng({ x, y }) {
-  return [ILLUSTRATED_MAP.height - y, x];
-}
-
 export function createImageMap(element, {
-  spots = [], onSelect, onPreview, onPreviewEnd, onPick, pick = false,
+  map: mapSpec = ILLUSTRATED_MAP,
+  spots = [], extraMarkers = [], onSelect, onPreview, onPreviewEnd, onPick, pick = false,
+  minZoom = -4, maxZoom = 1,
 } = {}) {
-  const { width: w, height: h, src } = ILLUSTRATED_MAP;
+  const { width: w, height: h, src } = mapSpec;
   const bounds = L.latLngBounds([0, 0], [h, w]);
   let pickOn = pick;
+  const toLatLng = ({ x, y }) => [h - y, x];
 
   const map = L.map(element, {
     crs: L.CRS.Simple,
-    minZoom: -4,
-    maxZoom: 1,
+    minZoom,
+    maxZoom,
     zoomSnap: 0.5,
     zoomDelta: 0.5,
     attributionControl: false,
@@ -70,15 +69,15 @@ export function createImageMap(element, {
   });
 
   const markerById = new Map();
-  spots.forEach((spot) => {
-    if (!spot.pixel) return;
-    const marker = L.marker(pixelToLatLng(spot.pixel), {
-      title: spot.name,
-      alt: `打开${spot.name}`,
+  const addMarker = (item, { eyebrow, onClick }) => {
+    if (!item.pixel) return;
+    const marker = L.marker(toLatLng(item.pixel), {
+      title: item.name,
+      alt: `打开${item.name}`,
       keyboard: true,
-      icon: markerIcon(spot),
+      icon: markerIcon(item),
     }).addTo(map);
-    marker.bindTooltip(spotPreview(spot, spot.previewEyebrow || '正在聆听'), {
+    marker.bindTooltip(spotPreview(item, item.previewEyebrow || eyebrow), {
       className: 'spot-tooltip', direction: 'top', offset: [0, -12], opacity: 1,
     });
     marker.on('click', (event) => {
@@ -87,11 +86,20 @@ export function createImageMap(element, {
         copyAt(event.latlng);
         return;
       }
-      onSelect?.(spot);
+      onClick?.(item);
     });
+    markerById.set(item.id, marker);
+    return marker;
+  };
+
+  spots.forEach((spot) => {
+    const marker = addMarker(spot, { eyebrow: '正在聆听', onClick: () => onSelect?.(spot) });
+    if (!marker) return;
     marker.on('tooltipopen', () => onPreview?.(spot));
     marker.on('tooltipclose', () => onPreviewEnd?.(spot));
-    markerById.set(spot.id, marker);
+  });
+  extraMarkers.forEach((item) => {
+    addMarker(item, { eyebrow: item.eyebrow || '专题', onClick: () => item.onClick?.(item) });
   });
 
   const applyPick = () => element.classList.toggle('is-picking', pickOn);

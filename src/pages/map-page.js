@@ -15,6 +15,10 @@ let dockOpen = false;
 let mapScheme = 'illustrated';
 let pickPixels = false;
 
+export function getMapScheme() {
+  return mapScheme;
+}
+
 const UNRECORDED = '#8a918e';
 
 function isUnrecorded(spot) {
@@ -159,8 +163,16 @@ export function renderMapPage(root, spots, navigate) {
   const illNote = () => (pickPixels
     ? '点击地图复制像素坐标<br><small>原点在图片左上角 · 再点标定关闭</small>'
     : '悬停标记试听<br><small>⌃点击复制像素 · 或打开标定</small>');
+  const openFood = () => {
+    soundLab.close();
+    setLabOpen(false);
+    audio.pause();
+    foodPanel.open();
+  };
+  const foodPin = { ...foodMarker, eyebrow: '专题', onClick: openFood };
   const illustratedMap = createImageMap(illustratedEl, {
     spots: spots.map(mapSpot),
+    extraMarkers: [foodPin],
     onSelect: openSpot,
     onPreview: preview,
     onPreviewEnd: endPreview,
@@ -177,16 +189,7 @@ export function renderMapPage(root, spots, navigate) {
       onSelect: openSpot,
       onPreview: preview,
       onPreviewEnd: endPreview,
-      extraMarkers: [{
-        ...foodMarker,
-        eyebrow: '专题',
-        onClick: () => {
-          soundLab.close();
-          setLabOpen(false);
-          audio.pause();
-          foodPanel.open();
-        },
-      }],
+      extraMarkers: [foodPin],
     });
     return geoMap;
   };

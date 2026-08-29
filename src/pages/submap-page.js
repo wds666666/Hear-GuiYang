@@ -1,6 +1,8 @@
 import { createMap } from '../map/create-map.js';
+import { createImageMap } from '../map/create-image-map.js';
 import { createExperienceOverlay } from '../components/experience-overlay.js';
 import { asset } from '../assets.js';
+import { getMapScheme } from './map-page.js';
 
 const audio = new Audio();
 audio.loop = true;
@@ -9,8 +11,9 @@ audio.playsInline = true;
 
 export function renderSubMapPage(root, spot, navigate) {
   const splatReady = spot.splat.status === 'ready';
+  const illustrated = getMapScheme() === 'illustrated' ? spot.illustratedMap : null;
   root.innerHTML = `<section class="submap-page" style="--spot:${spot.color}">
-    <div id="submap" class="map-canvas" aria-label="${spot.name}小地图"></div>
+    <div id="submap" class="map-canvas${illustrated ? ' map-canvas--illustrated' : ''}" aria-label="${spot.name}小地图"></div>
     <header class="submap-bar glass-panel">
       <button type="button" class="round-action round-action--light" data-back aria-label="返回贵阳地图">←</button>
       <div>
@@ -75,17 +78,28 @@ export function renderSubMapPage(root, spot, navigate) {
     color: spot.color,
   });
 
-  const mapController = createMap({
-    element: root.querySelector('#submap'),
-    spots: spot.subSpots,
-    color: spot.color,
-    center: [spot.lat, spot.lng],
-    zoom: 17,
-    fit: true,
-    onSelect: openSub,
-    onPreview: preview,
-    onPreviewEnd: endPreview,
-  });
+  const mapEl = root.querySelector('#submap');
+  const mapController = illustrated
+    ? createImageMap(mapEl, {
+      map: illustrated,
+      spots: spot.subSpots.map((sub) => ({ ...sub, color: spot.color })),
+      minZoom: -2,
+      maxZoom: 2,
+      onSelect: openSub,
+      onPreview: preview,
+      onPreviewEnd: endPreview,
+    })
+    : createMap({
+      element: mapEl,
+      spots: spot.subSpots,
+      color: spot.color,
+      center: [spot.lat, spot.lng],
+      zoom: 17,
+      fit: true,
+      onSelect: openSub,
+      onPreview: preview,
+      onPreviewEnd: endPreview,
+    });
 
   const back = root.querySelector('[data-back]');
   const goBack = () => navigate('/');
@@ -98,7 +112,7 @@ export function renderSubMapPage(root, spot, navigate) {
   const listeners = [];
   root.querySelectorAll('.spot-row').forEach((row) => {
     const sub = spot.subSpots.find((item) => item.id === row.dataset.sub);
-    const enter = () => mapController.focus(sub, { minZoom: 17 });
+    const enter = () => mapController.focus(sub, illustrated ? undefined : { minZoom: 17 });
     const leave = () => mapController.close(sub);
     const click = () => openSub(sub);
     row.addEventListener('mouseenter', enter);

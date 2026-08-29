@@ -1,7 +1,7 @@
 // 美食标签固定在贵阳中心，避开甲秀楼与青云市集的 marker。
 export const foodMarker = {
   id: 'guiyang-food', name: '贵阳美食', icon: '食', color: '#d1552f',
-  lat: 26.5810, lng: 106.7080, markerClass: 'sound-marker--food',
+  lat: 26.5810, lng: 106.7080, pixel: { x: 509, y: 2021 }, markerClass: 'sound-marker--food',
   description: '冰浆、烙锅、酸汤火锅——在贵阳，声音里最先冒出来的往往是锅气。',
   image: '/assets/images/posters/food/luoguo.jpg',
 };

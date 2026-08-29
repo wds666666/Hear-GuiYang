@@ -18,7 +18,7 @@ test('contains ten uniquely identified spots', () => {
 test('only the three planned spots have a sub map', () => {
   const withSubMap = spots.filter(hasSubMap).map((spot) => spot.id).sort();
   assert.deepEqual(withSubMap, ['ayunduocang', 'qianling-mountain', 'qingyun-market']);
-  assert.deepEqual(spots.filter(hasSubMap).map((spot) => spot.subSpots.length), [4, 3, 8]);
+  assert.deepEqual(spots.filter(hasSubMap).map((spot) => spot.subSpots.length), [4, 4, 7]);
 });
 
 test('sub spot ids are unique within a spot and resolvable', () => {
@@ -42,6 +42,7 @@ test('all declared local media exists', () => {
   }
   for (const spot of spots) {
     if (spot.splat.status === 'ready') assert.ok(exists(spot.splat.src), `missing ${spot.splat.src}`);
+    if (spot.illustratedMap?.src) assert.ok(exists(spot.illustratedMap.src), `missing ${spot.illustratedMap.src}`);
   }
 });
 
