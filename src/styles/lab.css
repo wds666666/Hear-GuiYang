@@ -1,0 +1,38 @@
+/* 一级地图右侧的声音实验室：右缘竖向入口 tab + 滑出抽屉。 */
+.lab-tab { position: absolute; z-index: 1100; top: 50%; right: 0; display: flex; align-items: center; gap: 8px; padding: 13px 16px 13px 14px; border: 0; border-radius: 14px 0 0 14px; cursor: pointer; font: 650 12px var(--display); letter-spacing: .04em; transition: opacity .24s, transform .24s; }
+.lab-tab__icon { display: inline-block; color: var(--jade); animation: breathe 2s ease-in-out infinite; }
+.lab-tab.is-hidden { opacity: 0; pointer-events: none; transform: translateY(-50%) translateX(10px); }
+.lab-tab:not(.is-hidden) { transform: translateY(-50%); }
+
+.sound-lab { position: absolute; z-index: 1200; top: 0; right: 0; bottom: 0; display: flex; width: min(384px, 92vw); flex-direction: column; padding: 20px 22px 22px; border-left: 1px solid rgba(255,255,255,.6); background: var(--mist); box-shadow: -22px 0 60px rgba(7,31,28,.22); backdrop-filter: blur(20px) saturate(1.15); opacity: 0; transform: translateX(102%); transition: transform .36s cubic-bezier(.32,.72,.3,1), opacity .28s; }
+.sound-lab.is-open { opacity: 1; transform: none; }
+.sound-lab[hidden] { display: none !important; }
+.sound-lab__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 10px; }
+.sound-lab__head h2 { margin: 0; font: 600 27px/1.1 var(--display); letter-spacing: .04em; }
+.sound-lab__head .round-action { width: 38px; height: 38px; flex: 0 0 auto; font-size: 20px; }
+.sound-lab__intro { margin: 0 0 14px; color: var(--ink-soft); font-size: 12.5px; line-height: 1.7; }
+
+.lab-group { margin-bottom: 12px; }
+.lab-group__title { margin: 0 0 7px; color: var(--ink-soft); font-size: 10px; font-weight: 750; letter-spacing: .15em; }
+.lab-list { display: flex; flex-direction: column; gap: 6px; max-height: 158px; overflow: auto; padding-right: 2px; scrollbar-width: thin; }
+.lab-chip { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px; text-align: left; background: rgba(16,38,36,.035); cursor: pointer; transition: border-color .2s, background .2s, transform .2s; }
+.lab-chip:hover { background: rgba(31,119,112,.08); }
+.lab-chip[aria-pressed="true"] { border-color: var(--jade); background: rgba(31,119,112,.12); }
+.lab-chip strong { font: 600 13px var(--display); }
+.lab-chip small { flex: 0 0 auto; color: var(--ink-soft); font-size: 10px; letter-spacing: .05em; }
+
+.lab-mix { display: grid; margin-top: auto; padding-top: 13px; border-top: 1px solid var(--line); gap: 10px; }
+.lab-mix__now { margin: 0; color: var(--ink-soft); font-size: 11px; letter-spacing: .03em; }
+.lab-mix label { display: grid; grid-template-columns: 64px 1fr 40px; align-items: center; gap: 9px; color: var(--ink-soft); font-size: 11px; font-weight: 650; }
+.lab-mix label i { font-style: normal; font-size: 10px; text-align: right; }
+.lab-mix input[type="range"] { width: 100%; accent-color: var(--jade); }
+.lab-mix .primary-action { margin-top: 4px; }
+.lab-mix .primary-action[aria-pressed="true"] { background: var(--jade); }
+
+@media (max-width: 700px) {
+  .lab-tab { top: auto; bottom: 86px; right: 10px; padding: 10px 13px; border-radius: 13px; }
+  .lab-tab.is-hidden { transform: translateX(10px); }
+  .lab-tab:not(.is-hidden) { transform: none; }
+  .sound-lab { width: 100%; padding: 14px 15px 16px; }
+  .lab-list { max-height: 126px; }
+}

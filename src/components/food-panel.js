@@ -75,19 +75,29 @@ export function createFoodPanel(host) {
   };
   chips.forEach((chip) => chip.addEventListener('click', onChipClick));
 
+  const pinHost = () => {
+    host.scrollLeft = 0;
+    host.scrollTop = 0;
+  };
+
   const close = () => {
     if (panel.hidden) return;
     stopAll();
     panel.classList.remove('is-open');
     panel.hidden = true;
+    pinHost();
   };
   const open = () => {
     if (!current) select(foods[0].id);
     panel.hidden = false;
     playVlog();
+    pinHost();
     // 先脱离 hidden 再加过渡类，否则抽屉不会滑出。
-    requestAnimationFrame(() => panel.classList.add('is-open'));
-    panel.querySelector('[data-close]').focus();
+    requestAnimationFrame(() => {
+      panel.classList.add('is-open');
+      pinHost();
+      panel.querySelector('[data-close]').focus({ preventScroll: true });
+    });
   };
 
   const closeBtn = panel.querySelector('[data-close]');

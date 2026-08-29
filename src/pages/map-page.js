@@ -1,5 +1,6 @@
 import { createMap } from '../map/create-map.js';
 import { createFoodPanel } from '../components/food-panel.js';
+import { createSoundLab } from '../components/sound-lab.js';
 import { foodMarker } from '../data/food.js';
 import { asset } from '../assets.js';
 
@@ -45,6 +46,10 @@ export function renderMapPage(root, spots, navigate) {
       </aside>
     </div>
     <div class="map-note glass-panel"><span class="map-note__pulse"></span><span>悬停标记试听<br><small>点击进入完整体验</small></span></div>
+    <button type="button" class="lab-tab glass-panel" data-lab-toggle aria-expanded="false" aria-controls="sound-lab">
+      <span class="lab-tab__icon" aria-hidden="true">◉</span>
+      <span>声音实验室</span>
+    </button>
   </section>`;
 
   const page = root.querySelector('.map-page');
@@ -58,6 +63,7 @@ export function renderMapPage(root, spots, navigate) {
   };
 
   const preview = (spot) => {
+    if (soundLab.isPlaying()) return; // 实验室正在融合播放时不叠加悬停试听
     if (activeSpot?.id === spot.id && !audio.paused) return;
     activeSpot = spot;
     audio.src = asset(spot.audio.src);
@@ -79,7 +85,32 @@ export function renderMapPage(root, spots, navigate) {
     root.querySelector(`[data-spot="${spot.id}"]`)?.classList.remove('is-active');
   };
 
+  const labTab = root.querySelector('[data-lab-toggle]');
+  const setLabOpen = (open) => {
+    labTab.setAttribute('aria-expanded', String(open));
+    labTab.classList.toggle('is-hidden', open);
+    page.scrollLeft = 0;
+    page.scrollTop = 0;
+  };
+
   const foodPanel = createFoodPanel(page);
+  // 声音实验室与地图环境声、美食抽屉互斥：融合播放时停掉悬停试听。
+  const soundLab = createSoundLab(page, {
+    onPauseAmbient: () => audio.pause(),
+    onClose: () => setLabOpen(false),
+  });
+  const onLabToggle = () => {
+    const opening = labTab.getAttribute('aria-expanded') !== 'true';
+    if (opening) {
+      audio.pause();
+      foodPanel.close();
+      soundLab.open();
+    } else {
+      soundLab.close();
+    }
+    setLabOpen(opening);
+  };
+  labTab.addEventListener('click', onLabToggle);
 
   const mapController = createMap({
     element: root.querySelector('#map'), spots,
@@ -90,6 +121,8 @@ export function renderMapPage(root, spots, navigate) {
       ...foodMarker,
       eyebrow: '专题',
       onClick: () => {
+        soundLab.close();
+        setLabOpen(false);
         audio.pause();
         foodPanel.open();
       },
@@ -123,7 +156,7 @@ export function renderMapPage(root, spots, navigate) {
   });
 
   const unlock = () => {
-    if (soundReady) return;
+    if (soundReady || soundLab.isPlaying()) return;
     if (!audio.src) audio.src = asset((activeSpot || spots[0]).audio.src);
     audio.play().then(() => {
       soundReady = true;
@@ -156,6 +189,8 @@ export function renderMapPage(root, spots, navigate) {
     });
     audio.pause();
     audio.currentTime = 0;
+    labTab.removeEventListener('click', onLabToggle);
+    soundLab.destroy();
     foodPanel.destroy();
     mapController.destroy();
   };

@@ -10,6 +10,7 @@ import { promisify } from 'node:util';
 const run = promisify(execFile);
 const root = resolve(import.meta.dirname, '..');
 const recordings = resolve(root, 'ref/音频以及vlog/听见贵阳-素材/真实录制');
+const aiImagine = resolve(root, 'ref/音频以及vlog/听见贵阳-素材/AI想象');
 const publicDir = resolve(root, 'public');
 
 // [来源目录, 源文件主名, slug]
@@ -36,6 +37,21 @@ const clips = [
 ];
 
 const splats = [['ref/3dGS/阿云朵仓.ply', 'assets/splats/ayunduocang.ply']];
+
+// AI 想象音轨：整段 wav 拷入 lab 目录，供地图页「声音实验室」融合播放。
+// [源文件主名, slug]
+const aiClips = [
+  ['侗寨鼓楼环境音_30秒', 'dong-drum-tower-ambience'],
+  ['侗族大歌_鼓楼氛围吟唱_30秒', 'dong-grand-song'],
+  ['侗族木构营造木工声_17秒', 'dong-carpentry'],
+  ['安顺地戏锣鼓_15秒', 'ansun-opera-gongs'],
+  ['苗岭清晨环境音_30秒', 'miaoling-morning'],
+  ['苗族芦笙芒筒合奏_18秒', 'miao-lusheng-mangtong'],
+  ['苗族银饰锻制_16秒', 'miao-silver-forging'],
+  ['苗族飞歌_山谷女声吟唱_20秒', 'miao-flying-song'],
+  ['贵州山林村寨环境基底_20秒', 'guizhou-forest-village'],
+  ['贵州蜡染坊环境音_加强版_30秒', 'guizhou-batik-workshop'],
+];
 
 async function ensureDir(file) {
   await mkdir(dirname(file), { recursive: true });
@@ -68,6 +84,7 @@ async function main() {
   let audioCount = 0;
   let videoCount = 0;
   let posterCount = 0;
+  let labCount = 0;
 
   for (const [folder, base, slug] of clips) {
     const srcAudio = resolve(recordings, folder, `${base}.mp3`);
@@ -88,13 +105,19 @@ async function main() {
     }
   }
 
+  for (const [base, slug] of aiClips) {
+    const outWav = resolve(publicDir, `assets/audio/lab/ai/${slug}.wav`);
+    if (await copyInto(resolve(aiImagine, `${base}.wav`), outWav)) labCount += 1;
+    else missing.push(`AI想象/${base}.wav`);
+  }
+
   for (const [from, to] of splats) {
     const target = resolve(publicDir, to);
     if (existsSync(target) && (await stat(target)).size > 0) continue;
     if (!(await copyInto(resolve(root, from), target))) missing.push(from);
   }
 
-  console.log(`audio ${audioCount} · video ${videoCount} · poster ${posterCount} · splat ${splats.length}`);
+  console.log(`audio ${audioCount} · video ${videoCount} · poster ${posterCount} · lab ${labCount} · splat ${splats.length}`);
   if (missing.length) console.warn(`缺失素材（保持“素材准备中”占位）：\n  ${missing.join('\n  ')}`);
 }
 
