@@ -147,6 +147,8 @@ export function renderMapPage(root, spots, navigate) {
     setLabOpen(opening);
   };
   labTab.addEventListener('click', onLabToggle);
+  soundLab.open();
+  setLabOpen(true);
 
   const illustratedEl = root.querySelector('#map-illustrated');
   const geoEl = root.querySelector('#map');
