@@ -4,7 +4,7 @@ import { aiSounds, realSounds } from '../data/lab.js';
 // 地图页右侧的声音实验室抽屉：AI 想象 × 真实采集各选一条，
 // 两轨同时循环播放并各自控制音量，叠加成一段「融合」的贵阳。
 // 融合播放满这么久，就算「体验完成」，送一张纪念海报。
-const KEEPSAKE_DELAY = 5000;
+const KEEPSAKE_DELAY = 20000;
 
 export function createSoundLab(host, { onPauseAmbient, onClose, onKeepsake } = {}) {
   const groups = [
@@ -65,7 +65,7 @@ export function createSoundLab(host, { onPauseAmbient, onClose, onKeepsake } = {
     clearTimeout(keepsakeTimer);
     keepsakeTimer = 0;
   };
-  // 融合满 5 秒算体验完成：先停下声音再弹海报，重新播一次可以再领一张。
+  // 融合满 20 秒算体验完成：先停下声音再弹海报，重新播一次可以再领一张。
   const armKeepsake = () => {
     clearKeepsakeTimer();
     keepsakeTimer = setTimeout(() => {
