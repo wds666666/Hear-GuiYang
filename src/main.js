@@ -8,7 +8,9 @@ import './styles/submap.css';
 import './styles/food.css';
 import './styles/lab.css';
 import './styles/keepsake.css';
+import './styles/wechat.css';
 import { spots, getSpot, getSubSpot, hasSubMap } from './data/spots.js';
+import { mountWeChatGate } from './wechat-gate.js';
 import { createRouter, navigate } from './router.js';
 import { renderMapPage } from './pages/map-page.js';
 import { renderSpotPage } from './pages/spot-page.js';
@@ -17,6 +19,7 @@ import { renderSubMapPage } from './pages/submap-page.js';
 import { renderSubSpotPage } from './pages/subspot-page.js';
 
 const root = document.querySelector('#app');
+mountWeChatGate();
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => {});
